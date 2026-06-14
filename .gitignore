@@ -1,0 +1,13 @@
+node_modules
+.next
+/.env.local
+.env
+dist
+coverage
+/*.log
+.gstack/
+qr_frontend/
+qr_backend/
+qr_cf_code/
+.openclaw/
+
