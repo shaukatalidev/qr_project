@@ -46,11 +46,13 @@ and more — and update where they point without reprinting.
 Free ₹0 / $0 · Starter ₹399 / $9 · Pro ₹999 / $19 · Agency ₹2499 / $39 (per month).
 
 **Review-platform description** (paste into G2 / Capterra "About" / long description — built to lead with the differentiator):
-> Qravio is a dynamic QR code generator with real-time scan analytics. Unlike most "free" QR tools that watermark your codes or only make static ones, Qravio's free tier creates genuinely no-watermark dynamic QR codes you can edit after printing — change where a code points without reprinting it. Create trackable QR codes for websites, PDFs, vCards, business profiles, events, WiFi, social links, coupons and more (20+ types), each with a branded landing page, and track scans in real time by time, location and device. Pro features include custom branded domains, password-protected codes and A/B split testing. Plans start free; paid tiers from $9/month.
+> Qravio is a dynamic QR code generator with real-time scan analytics. Unlike most "free" QR tools that watermark your codes or only make static ones, Qravio's free tier creates genuinely no-watermark dynamic QR codes you can edit after printing — change where a code points without reprinting it. Create trackable QR codes for websites, PDFs, vCards, business profiles, events, WiFi, social links, coupons and more (20+ types), each with a branded landing page, and track scans in real time by time, location and device. Paid plans add custom branded domains, password-protected codes and A/B split testing. Plans start free; paid tiers from $9/month.
 
 ---
 
 ## 1. Wikidata  (strongest free entity signal — AI reads it directly)
+
+> ✅ **DONE 2026-07-09 — item `Q140489820`** (`https://www.wikidata.org/wiki/Q140489820`), statements all set. **Outstanding: add `reference URL (P854)` = Crunchbase URL on inception + official-website statements once Crunchbase is live** (references currently 0 = deletion risk).
 
 **Model it as ONE item** = the Qravio software/product. Do **not** split into separate "company" + "product" items yet — a 4-month-old startup barely clears notability for one item, let alone two. `instance of: web application` carries both the product and the brand.
 
@@ -77,7 +79,7 @@ Free ₹0 / $0 · Starter ₹399 / $9 · Pro ₹999 / $19 · Agency ₹2499 / $3
 |---|---|
 | X/Twitter username (P2002) | `qravioapp` |
 | LinkedIn company ID (P4264) | `qravioapp` |
-| Crunchbase organisation ID (P2088) | *(add once Crunchbase is live)* |
+| Crunchbase organisation ID (P2088) | `qravio` |
 
 **References:** on the **inception** and **official-website** statements, add `reference URL (P854)` → your Crunchbase page (or a Product Hunt / press link). This is the single thing that stops the item being deleted.
 
@@ -87,7 +89,7 @@ Free ₹0 / $0 · Starter ₹399 / $9 · Pro ₹999 / $19 · Agency ₹2499 / $3
 
 ## 2. Crunchbase  (feeds Google Knowledge Graph + a backlink — **do this FIRST**)
 
-This is the reference that keeps your Wikidata item from being deleted, so create it before Wikidata.
+This is the reference that keeps your Wikidata item from being deleted, so create it before Wikidata. **⏳ SUBMITTED 2026-07-09 — intended URL `https://www.crunchbase.com/organization/qravio` (org ID `qravio`), still PENDING moderation (publicly "no match found"). Add it as the Wikidata reference once it goes live.**
 
 **How it works:** sign up for a free Crunchbase account with `support@qravio.app`, then **"Add a Company."** Edits go through a **moderation queue** (often a few days) before they're public and indexed — start it early. A domain-matching email speeds verification. Your profile URL will be `crunchbase.com/organization/qravio` (note it for `sameAs` later).
 

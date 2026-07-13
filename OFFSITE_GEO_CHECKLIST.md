@@ -4,7 +4,42 @@
 
 **Strategic hook to lead with everywhere:** *genuinely free, no-watermark dynamic QR tier* + *real-time scan analytics* + *editable after printing*. That's the differentiator that wins the competitor-alternative cluster and the AI "which is best / which is free" consensus.
 
+> 📝 **Paste-ready copy for the manual steps below lives in [`GEO_CONTENT_PACK.md`](./GEO_CONTENT_PACK.md)** — Product Hunt launch kit (§1), review-drive founder email (§1), Reddit/Quora answer bank (§4), listicle outreach email (§5). Field sheets (verbatim values) are in [`BRAND_KIT.md`](./BRAND_KIT.md).
+
 **Status legend:** `[ ]` todo · `[~]` in progress · `[x]` done · 🔒 = blocks later steps
+
+---
+
+## ▶ RESUME HERE — progress snapshot (last worked: 2026-07-14)
+
+**Live / in `sameAs`:** X `qravioapp` · LinkedIn `qravioapp` · **Wikidata `Q140489820`** (⏳ still needs a `reference URL (P854)` on inception + official-website statements — add the Crunchbase URL once it's public).
+**Pending moderation (URLs to come):** **Crunchbase** (`/organization/qravio`, "no match found" publicly) · **G2** (✅ approved 2026-07-11, direct URL arriving by email) · **Capterra** (✅ **PUBLISHED 2026-07-14** — "your listing is live" email received; direct `/p/<id>/<name>/` URL NOT yet captured, so not yet in `sameAs`). ⚠️ Not yet Google-indexed and not on the popularity-sorted category first page as of 2026-07-14 (normal for a zero-review new listing) — could not independently confirm the public page; **grab the canonical URL from the Capterra dashboard** to unblock §8a wiring + the §B review-drive deep link.
+
+**Next actions, in order:**
+1. **AlternativeTo** — deferred to **Mon** (site heavy-load over the weekend). Log in w/ `support@qravio.app` → search "Qravio" → "add new application" → use the core block below → mark Qravio "alternative to" the 5 competitors.
+2. **Other directories** (same core block): **SaaSHub** (`saashub.com` → Submit a product) · **Slant** (`slant.co` → add Qravio as an option under "best QR code generator") · **SaaSworthy** (`saasworthy.com` → Add Product).
+3. **Build the happy-user list** for the review drive (unblocked now): export active users → segment happiest (high scan volume, repeat logins, support praise).
+4. **When G2 + Capterra URLs arrive** → paste to Claude → wire `COMPANY.g2`/`COMPANY.capterra` + `sameAs` (§8a); capture each "write a review" deep-link.
+5. **Fire the review drive** → `GEO_CONTENT_PACK.md §B` email → target 15–20+ honest reviews → then §8b `aggregateRating`.
+6. **Add Crunchbase URL as the Wikidata `P854` reference** once Crunchbase resolves publicly (anti-deletion).
+7. **Verify GetApp + Software Advice** picked up the Capterra listing — now actionable since Capterra published 2026-07-14 (allow a few days for propagation + Google indexing first; ⚠️ propagation may have changed — "Capterra now part of G2" per LinkedIn 2026).
+
+**Reusable directory core block:**
+```
+Name:        Qravio
+URL:         https://qravio.app
+Tagline:     Free dynamic QR code generator with real-time scan analytics —
+             edit your QR codes anytime, no reprinting, no watermark.
+Category:    QR Code Generator / QR Code Software
+Tags:        QR code generator, Free, Freemium, Analytics, Dynamic QR
+Alternative to: Flowcode · QR Tiger · Uniqode · QR-Code-Generator.com · QRCode Monkey
+Description: Qravio is a dynamic QR code generator with real-time scan analytics,
+a genuinely free no-watermark dynamic tier, and custom domains. Create editable,
+trackable QR codes for websites, PDFs, vCards, business profiles, events, WiFi,
+and more — and update where they point without reprinting.
+```
+
+> ⚠️ **Code note:** `COMPANY.crunchbase` is staged in `sameAs` but Crunchbase is still 404 publicly — verify it resolves 200 before any FE deploy, or drop that one line (see comment in `structured-data.ts`).
 
 ---
 
@@ -42,10 +77,10 @@ and more — and update where they point without reprinting.
 
 ## §1 — Review platforms (HIGHEST weight) 🔒 for §8 aggregateRating
 
-These are the single strongest SaaS GEO signal — LLMs and Google both lean on G2/Capterra consensus for "best / top / which should I use" queries. Order = priority.
+These are the single strongest SaaS GEO signal — LLMs and Google both lean on G2/Capterra consensus for "best / top / which should I use" queries. Order = priority. *(Copy: Product Hunt launch kit + review-drive email in [`GEO_CONTENT_PACK.md §A/§B`](./GEO_CONTENT_PACK.md).)*
 
-- [ ] **G2** — create/claim the Qravio listing (g2.com). Category: QR Code Generator Software.
-- [ ] **Capterra** (capterra.com) — vendor listing. *Single submission also feeds GetApp + Software Advice* (all Gartner Digital Markets) — fill the vendor portal once.
+- [x] **G2** — listing **APPROVED 2026-07-11** (created via Sell on G2 → footer "Add your product/service"; free profile; category QR Code Generator Software). ⏳ Direct profile URL arriving by email — paste it in to wire `COMPANY.g2` + `sameAs` (§8a) and capture the write-review deep link for the §B review drive. **Empty until reviews → run the review drive next.**
+- [x] **Capterra** — **PUBLISHED 2026-07-14** ("your product listing Qravio is now published" email); submitted 2026-07-11 (target market = Freelancers/Small-Business/Mid-Market, category QR Code Software, Free version=Yes, Free trial=No). ⏳ Direct `/p/<id>/<name>/` profile URL not yet captured — grab it from the Capterra dashboard, paste in for `sameAs` (§8a) + the §B write-review deep link. Not yet Google-indexed / not on the category first page as of 2026-07-14 (normal for a zero-review listing); Capterra may have adjusted content/categories to fit their guidelines — review the live page. ⚠️ **"Capterra now part of G2" (per LinkedIn 2026) — the old GetApp + Software Advice auto-propagation may have changed; verify §3 now that it's live.**
 - [ ] **Product Hunt** — plan a launch (not just a profile). Pick a Tue–Thu, line up hunters/upvoters in advance, lead with the free-no-watermark angle. PH pages get cited and rank fast.
 - [ ] **TrustRadius** (trustradius.com) — claim profile.
 - [ ] **SourceForge / Slashdot** (optional, easy domain) — software listing.
@@ -64,8 +99,8 @@ The profiles are worthless empty. You need real reviews to (a) trigger rich-resu
 
 These are the structured sources Google's Knowledge Graph and LLMs ingest directly. High GEO value, low ongoing cost.
 
-- [ ] **Wikidata** — create a Qravio item (instance of: *software* / *business*). Add: official website, logo, inception date, country (India), and statements that match the canonical block. This is the strongest free entity signal and is the one most directly read by AI models.
-- [ ] **Crunchbase** — create the company profile (free tier). Even a basic profile feeds the knowledge graph + earns a backlink.
+- [x] **Wikidata** — created 2026-07-09: **`Q140489820`** (`https://www.wikidata.org/wiki/Q140489820`). instance of=web application, official website, inception Feb 2026 (month precision), country=India, license=proprietary software, external IDs P2002/P4264/P2088 all set. Wired into `COMPANY.wikidata` + `sameAs`. ⏳ **References still 0 — add `reference URL (P854)` = the Crunchbase URL on the inception + official-website statements once Crunchbase is public (anti-deletion). Optional: lowercase the description ("dynamic…" not "Dynamic…").**
+- [~] **Crunchbase** — submitted 2026-07-09, intended URL `https://www.crunchbase.com/organization/qravio` (org ID `qravio`). ⏳ **PENDING Crunchbase moderation — publicly returns "no match found" (not live yet).** Staged in `COMPANY.crunchbase` + `sameAs` but gated: verify it resolves 200 public before the FE deploy, else drop that one line. Once live: add it as the Wikidata `reference URL (P854)`.
 - [ ] **LinkedIn company page** — must exist + be branded (it's already in `sameAs`). Post occasionally so it's not a ghost.
 - [ ] **Google Business Profile** — only if you want a local/India entity; optional for a pure SaaS, but it strengthens NAP consistency.
 - [ ] After the above are live, you become eligible for a **Google Knowledge Panel** (don't "apply" — it appears once entity confidence is high; Wikidata + Crunchbase + consistent NAP are the inputs).
@@ -87,7 +122,7 @@ Your on-site wedge is the `/[x]-alternative` + `/vs/[competitor]` cluster. These
 
 ## §4 — Community consensus (Reddit / Quora) — DISCLOSED & honest
 
-This is where AI models harvest "real people say…" consensus. Rules: **always disclose** you're affiliated with Qravio, only post where genuinely relevant, lead with a real answer (don't drop a link into an empty comment). Astroturfing gets the brand poisoned in exactly the corpus you're trying to win.
+This is where AI models harvest "real people say…" consensus. Rules: **always disclose** you're affiliated with Qravio, only post where genuinely relevant, lead with a real answer (don't drop a link into an empty comment). Astroturfing gets the brand poisoned in exactly the corpus you're trying to win. *(Draft answers for the 4 target questions + per-sub angles in [`GEO_CONTENT_PACK.md §C`](./GEO_CONTENT_PACK.md).)*
 
 - [ ] Build a watch-list of threads/questions. Target subs: r/QRcode, r/smallbusiness, r/marketing, r/restaurateur, r/Entrepreneur, r/web_design, r/nonprofit.
 - [ ] Quora: answer "best free QR code generator", "how to edit a QR code after printing", "static vs dynamic QR code", "do QR codes expire".
@@ -98,7 +133,7 @@ This is where AI models harvest "real people say…" consensus. Rules: **always 
 
 ## §5 — Listicle / editorial inclusion ("best QR code generator 2026")
 
-Ranking listicles dominate the head-term SERP you're *not* chasing directly — but getting *included* borrows their authority and gets you into the AI training/citation corpus.
+Ranking listicles dominate the head-term SERP you're *not* chasing directly — but getting *included* borrows their authority and gets you into the AI training/citation corpus. *(Outreach + follow-up email in [`GEO_CONTENT_PACK.md §D`](./GEO_CONTENT_PACK.md).)*
 
 - [ ] Identify the top 15–20 "best QR code generator" / "best free QR code generator 2026" articles.
 - [ ] Outreach to each author/editor with the differentiator pitch (free, no-watermark, *editable* dynamic tier — most "free" tools watermark or are static-only). Offer a free Pro account to test.
