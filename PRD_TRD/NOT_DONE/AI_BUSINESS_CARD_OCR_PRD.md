@@ -10,6 +10,10 @@
 
 ---
 
+**IMPLEMENTED — Phase 0 backend (2026-07-14).** Shipped as migration **`0026`** (not `0024` — that slot was taken; roadmap table was stale) with decode-before-meter ordering (a junk upload 415s without burning a scan credit) and per-field validation. See the TRD's IMPLEMENTED banner for the full delta list. Remaining: frontend (Phase 1) + the ≥85% accuracy eval gate.
+
+---
+
 ## 1. TL;DR / Summary
 
 A user building a vCard QR can **snap or upload a photo of a paper business card**. The image is POSTed to a single new backend endpoint, which sends it to **`claude-haiku-4-5`** (vision-capable, cheapest) with a strict JSON-extraction prompt. Claude returns structured fields — `first_name`, `last_name`, `company`, `job_title`, `phone`, `email`, `website`, `city`, etc. — that **pre-fill the existing vCard content-type form**. The user **reviews and edits every field before saving** (confirm-before-save; we never auto-create a QR from OCR output).
