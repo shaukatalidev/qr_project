@@ -41,7 +41,7 @@ docker-compose up -d
 
 **Database**: Supabase REST client (not SQLAlchemy despite it being in requirements). All queries use the `supabase-py` fluent API: `db.table("x").select("*").eq("id", id).execute()`. The service role key is used (bypasses RLS). Client is a lazy-initialized singleton in `src/database/supabase.py`.
 
-**Config**: `APP_ENV` env var selects settings class (`development`/`staging`/`production`) via `src/config/manager.py`. Settings singleton imported as `from src.config.manager import settings`.
+**Config**: `ENVIRONMENT` env var (not `APP_ENV`) selects the settings class via `src/config/manager.py` — `DEV`/`STAGE`/`PROD` plus the long forms (`development`, `staging`, `production`), case-insensitive; anything unrecognized resolves to production. Settings singleton imported as `from src.config.manager import settings`. On startup `settings.validate_public_urls()` refuses to boot outside development if `QR_DYNAMIC_URL`/`PUBLIC_API_URL`/`FRONTEND_URL`/`SITE_URL` still hold localhost defaults — these get published (into QR pixels and emails), so set them per environment before deploying.
 
 **Cloudflare KV sync** (`src/utilities/cloudflare_kv.py`): Every QR write calls `write_to_kv()` synchronously after the DB write. `build_kv_content(qr_id, qr_type, db)` fetches type-specific content (vcard fields, file paths, event data, etc.) and packages it for the Worker. If the KV write fails, it raises `RuntimeError` — there is no retry.
 
@@ -195,12 +195,13 @@ Frontend → authApi (Axios + Supabase JWT) → FastAPI Backend
 ## Environment Setup
 
 **Backend** (`qr_backend/.env`, copy from `.env.example`):
-- `APP_ENV` — `development|staging|production`
+- `ENVIRONMENT` — `DEV|STAGE|PROD` (long forms also accepted; unrecognized ⇒ production)
 - `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`
 - `INTERNAL_SECRET` — shared with Worker
 - `CF_ACCOUNT_ID`, `CF_KV_NAMESPACE_ID`, `CF_API_TOKEN`
 - `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET`
-- `RESEND_API_KEY`, `HASHING_SALT`, `ALLOWED_ORIGINS`, `FRONTEND_URL`
+- `RESEND_API_KEY`, `HASHING_SALT`, `ALLOWED_ORIGINS`
+- Public URLs, **required in every deployed env** (they get baked into QR images and emails; startup fails if left on localhost): `QR_DYNAMIC_URL`, `PUBLIC_API_URL`, `FRONTEND_URL`, `SITE_URL`
 
 **Frontend** (`qr_frontend/.env.local`):
 - `NEXT_PUBLIC_API_URL` — FastAPI backend URL
