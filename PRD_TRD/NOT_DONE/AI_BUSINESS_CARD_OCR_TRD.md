@@ -12,6 +12,15 @@
 
 ---
 
+**IMPLEMENTED — Phase 0 (2026-07-14, post `/plan-eng-review`).** Backend shipped. Deltas from this draft, applied per the eng review:
+- **Migration slot is `0026`, not `0024`.** `0024`/`0025` were already taken on disk (`webhook_scan_milestone`, `campaign_tags_rollup`); the roadmap reservation table was stale. Shipped `0026_ai_business_card_ocr.sql` (per-tier `|| '{...}'::jsonb` blob seed, following the `0014_ai_analyst.sql` convention — keeps both keys discoverable by `test_feature_gate_coverage`).
+- **Decode-before-meter.** `card_ocr.downscale()` (decode + decompression-bomb guard + format re-validation) runs in the route **before** `increment_card_ocr_usage`, so a malformed/undecodable/bomb upload returns **415 without charging a scan credit**. The `§3.1` step order below (increment at step 3, decode inside step 4) is **superseded** by this ordering.
+- **Per-field validation, never `VcardContent(**fields)`.** `first_name`/`last_name` are required on the model; OCR may read neither, so extracted fields are validated field-by-field (email regex, URL coercion, phone normalize, length caps) and returned as a partial dict.
+- **AI Scan Analyst is shipped** (not "planned"): `ai_analyst.py`, `increment_ai_usage`, and the `ANTHROPIC_API_KEY` binding (`base.py`) already exist; `anthropic`+`Pillow` are in `requirements.txt`. Remaining Phase-0 checklist item: confirm `ANTHROPIC_API_KEY` is populated in staging+prod (binding default is empty).
+- **Files shipped:** `migrations/0026_ai_business_card_ocr.sql`, `src/utilities/card_ocr.py`, `src/api/routes/vcard_ocr.py`, `subscription.py` (`FEATURE_ENFORCEMENT`+`_QUOTA_SPEC`), `endpoints.py`, `base.py` (`CARD_OCR_MODEL`), `requirements.txt`, `tests/unit_tests/test_card_ocr.py` (17 tests green, incl. the 415-doesn't-meter invariant). Remaining: frontend (Phase 1) + accuracy eval gate.
+
+---
+
 ## 1. Overview & Architecture
 
 A user building a vCard QR can snap or upload a photo of a paper business card. The image is POSTed to **one new metered backend endpoint**, downscaled server-side, and sent to **`claude-haiku-4-5`** (vision) with a strict JSON-extraction prompt. Claude returns the exact field set of the existing `VcardContent` Pydantic model. The backend validates every value, returns the matched fields, and the frontend **pre-fills the existing vCard form**. The user reviews/edits every field before saving through the normal wizard. **No QR is auto-created from OCR output** — confirm-before-save is a hard invariant.

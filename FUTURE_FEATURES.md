@@ -10,9 +10,32 @@
 
 ---
 
-## Migration sequence (reserved + assigned)
+## Migration sequence — CORRECTED 2026-07-14 (⚠️ roadmap reservations diverged from disk)
 
-Migrations are applied by hand in the Supabase SQL editor; current DB highest **applied** = `0013`. All 12 specs hold a unique slot:
+> ⚠️ **The original reservation table (below, collapsed) was WRONG.** On-disk migration
+> numbering advanced independently of these reservations, so slots `0019`–`0025` map to
+> *different* features than reserved. **NEVER take a slot number from this doc** — always
+> `ls qr_backend/migrations/` and use the next free integer. Re-confirm the highest
+> **applied** number against the DB before running anything.
+
+**Actual on-disk numbering (source of truth, as of 2026-07-14):**
+
+| Slot | Actual file |
+|------|-------------|
+| 0019 | `0019_qr_list_pagination_indexes.sql` |
+| 0020 | `0020_social_avatar.sql` |
+| 0021 | `0021_social_cover.sql` |
+| 0022 | `0022_google_review_funnel.sql` |
+| 0023 | `0023_outbound_webhooks.sql` |
+| 0024 | `0024_webhook_scan_milestone.sql` |
+| 0025 | `0025_campaign_tags_rollup.sql` |
+| **0026** | **`0026_ai_business_card_ocr.sql` — AI Business-Card OCR (SHIPPED, Phase 0 backend)** |
+
+**Next free migration slot = `0027`.**
+
+<details><summary>Original (stale) reservation table — provenance only, do NOT use for slot numbers</summary>
+
+Migrations are applied by hand in the Supabase SQL editor; original assumption: DB highest **applied** = `0013`.
 
 | Slot | Feature | Spec status | Needs migration? |
 |------|---------|-------------|------------------|
@@ -30,7 +53,7 @@ Migrations are applied by hand in the Supabase SQL editor; current DB highest **
 | 0024 | `AI_BUSINESS_CARD_OCR` | draft | minimal (`0024_ai_business_card_ocr.sql` — flag + usage meter; core endpoint needs no schema) |
 | 0025 | `PRINT_READY_EXPORT` | draft | flag-only (`0025_print_export.sql`) |
 
-**Next free migration slot = `0026`.** When building, apply migrations in slot order; re-confirm the highest *applied* number against the DB first.
+</details>
 
 ---
 
