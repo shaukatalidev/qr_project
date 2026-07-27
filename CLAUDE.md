@@ -114,8 +114,9 @@ src/app/
 ### Commands
 ```bash
 npm run dev           # wrangler dev (local preview, uses preview_id KV namespace)
-npm run deploy        # deploy to staging
+npm run deploy:dev    # deploy to staging/dev  (there is NO plain `npm run deploy`)
 npm run deploy:prod   # deploy to production
+node src/<name>.test.mjs   # tests are standalone scripts — no runner, no `npm test`
 wrangler secret put INTERNAL_SECRET
 ```
 
