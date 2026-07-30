@@ -168,6 +168,23 @@ if (kvContent && kvContent.files?.length > 0) {
 
 **Adding a new scan page template**: (1) add a `*Template.js` in `src/pages/<type>/`, (2) wire it into that type's dispatcher (`src/pages/<type>Page.js` or `src/pages/<type>/index.js`) via `templateId`, (3) add the template entry to `qr_frontend/src/lib/constants/page-templates.ts`, (4) create a React preview component in `qr_frontend/src/components/qr-generator/templates/`, (5) add a case to `TemplatePicker.tsx` and `PagePreview.tsx`. Every React template **must** be mirrored by a matching Worker template — keep the two in sync.
 
+**Multilingual chrome (`vcard` / `vcard_plus` / `business` / `menu`)**: those templates take a
+trailing optional `i18n` context and route every hardcoded label through `t('key')`. Dictionaries
+live in `qr_cf_code/src/i18n/` and are **duplicated** in `qr_frontend/src/lib/i18n/` — separate git
+repos, so no shared import is possible. Both check in the same canonical `keys.json` (key → English
+**value**) and each has a test pinning its own `en` dictionary to it. Nothing inside either repo can
+see the other's copy, so after changing any chrome string run:
+
+```bash
+./scripts/check-i18n-parity.sh    # diffs the two keys.json files; manual pre-merge step
+```
+
+`<html lang>` is stamped **once**, centrally, by `finalizeLocalizedResponse` in `src/index.js`'s
+response tail (beside the pixel/consent injectors) — never per template. Locale is resolved per scan
+by `src/utils/locale.js` after the status/schedule/password branches, so system pages stay English.
+A monolingual QR (`i18n` absent, or one locale) must stay **byte-for-byte identical** to pre-feature
+output; `src/i18n/templates.test.mjs` asserts that and is the regression to protect.
+
 ## Key Data Flow
 
 ```
