@@ -173,11 +173,26 @@ trailing optional `i18n` context and route every hardcoded label through `t('key
 live in `qr_cf_code/src/i18n/` and are **duplicated** in `qr_frontend/src/lib/i18n/` — separate git
 repos, so no shared import is possible. Both check in the same canonical `keys.json` (key → English
 **value**) and each has a test pinning its own `en` dictionary to it. Nothing inside either repo can
-see the other's copy, so after changing any chrome string run:
+see the other's copy, so after changing any chrome string **or the locale set** run:
 
 ```bash
-./scripts/check-i18n-parity.sh    # diffs the two keys.json files; manual pre-merge step
+./scripts/check-i18n-parity.sh    # manual pre-merge step; not CI — no CI job sees both repos
 ```
+
+It diffs three things, one per blind spot: the two `keys.json` files (a drifted string means the
+builder preview lies about the live page), the two `SUPPORTED_LOCALES` arrays **including order**
+(a locale in one repo only means the builder offers a language the Worker refuses, and the visitor
+silently gets the default), and the dictionary files on disk (a locale listed in both barrels but
+written in only one still passes that repo's own tests).
+
+**11 locales, LTR only** — `en`, the five Indic (`hi ta te bn mr`), the five world (`zh es fr pt ru`).
+`MAX_LOCALES = 6` is a **per-QR cap below the supported set**, not a tautology: the switcher renders
+a chip per enabled locale and eleven wrap past the fold on a 390px phone. `NOTO_FAMILY` /
+`NOTO_STACK_NAME` membership means *"needs a webfont"*, **not** *"is not English"* — Inter already
+covers Latin **and Cyrillic**, so `es`/`fr`/`pt`/`ru` deliberately have no entry and tests assert
+that absence. Only `zh` and the four Indic scripts load a face. RTL (`ar`/`ur`/`he`/`fa`) is excluded
+by assertion in all three repos: it needs `dir="rtl"` out of `withDocumentLang` plus ~40 directional
+CSS declarations across 20 files.
 
 `<html lang>` is stamped **once**, centrally, by `finalizeLocalizedResponse` in `src/index.js`'s
 response tail (beside the pixel/consent injectors) — never per template. Locale is resolved per scan
