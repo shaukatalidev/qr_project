@@ -175,6 +175,83 @@ This is the reference that keeps your Wikidata item from being deleted, so creat
 
 Position Qravio as an **alternative to**: Flowcode, QR Tiger, Uniqode, QR-Code-Generator.com, QRCode Monkey. Lead with the differentiator: **genuinely free, no-watermark, editable dynamic tier**. Tag *Free* + *Freemium*. This compounds your on-site `/[x]-alternative` pages.
 
+### 5a. AlternativeTo — full submission set
+
+> ⏳ **SUBMITTED 2026-07-31 — slug confirmed `qravio`**, URL `https://alternativeto.net/software/qravio/`. Still **PENDING moderation**: logged-out fetch 404s (the submitter sees it while signed in; Google can't crawl it yet). **Do not** add to `COMPANY.alternativeTo` / `sameAs` until it resolves 200 logged-out, and don't start the "Suggest an alternative" pass on competitor pages until then either — an unpublished app can't be suggested.
+
+> ⚠️ **The one place §0 does NOT apply verbatim.** AlternativeTo's editors reject promotional copy ("genuinely free", "no watermark" as a *pitch*, "best"), so the tagline and description below are deliberately neutral rewrites of the §0 one-liner/boilerplate. Same facts, no adjectives — do not "fix" the drift by pasting the G2 copy here. Every other field still comes from §0 verbatim.
+
+**Step 1 — name & main purpose.** Rendered on-site as *"Qravio is described as '…'"*.
+
+```
+Name:     Qravio
+URL:      https://qravio.app
+Tagline:  QR code generator with editable dynamic codes, real-time scan
+          analytics, hosted landing pages, custom domains and team workspaces.
+```
+
+**Step 2 — import from Mac/iOS app stores: SKIP.** Web only — **no native mobile app**; don't claim one on any field of this form.
+
+**Step 3 — main data.** Description (verified 2026-07-31 against the live pricing page + `qr_frontend/src/lib/constants/qr-types.ts` `ALL_TYPES`):
+
+```
+Qravio is a web-based QR code generator and management platform. It creates
+both static QR codes (unlimited on every plan, no watermark) and dynamic QR
+codes, whose destination can be edited after the code is printed — so the same
+printed code can be re-pointed without reprinting it.
+
+Codes can be generated for 20+ content types, including website links, PDFs,
+image galleries, video, MP3, vCard and vCard Plus digital business cards,
+business profiles, events, coupons, app-store links, lead-capture forms, WiFi,
+email, SMS, WhatsApp, Bitcoin and PayPal. Dynamic types render a hosted mobile
+landing page built from customisable templates.
+
+Every dynamic code records scans in real time, broken down by time, location
+and device, alongside folders and team workspaces with owner/editor/viewer
+roles. Paid plans add custom branded domains, password-protected codes, A/B
+split routing, lead capture, retargeting pixels, bulk generation, scheduled
+reports and a REST API.
+
+Qravio runs in the browser; there is no native mobile app. The free plan
+includes 5 dynamic codes and 2,000 scans per month with no watermark, and paid
+plans start at $9/month.
+```
+
+| Field | Value |
+|---|---|
+| Platforms | `Online` / `Web-based` (+ `Software as a Service (SaaS)` if offered) — **nothing else** |
+| License | Proprietary |
+| Pricing model | Freemium — Subscription |
+| Free version | **Yes** (limited functionality) |
+| Free trial | **No** — leave unchecked; there is no trial, the Free plan is the entry (`trialing` in the DB is a provider status, not a marketed trial) |
+| Price range | `$9 – $39/month` · `$7.50 – $32.50/mo` billed annually · INR rail ₹399 / ₹999 / ₹2,499 |
+| Categories | primary **QR Code Generator**; also *Office & Productivity*, and *Business & Commerce* if offered |
+| Tags | QR Code · QR Code Generator · Dynamic QR Code · QR Code Tracking · QR Code Analytics · Scan Analytics · vCard · Digital Business Card · Landing Page · Link Management · Analytics · Marketing · WiFi · PDF · Custom Domain · Team Collaboration · Freemium |
+| Features (check) | Ad-free · Analytics/Statistics · API (Pro+) · Team collaboration · Custom domain (Pro+) · Password protection (Starter+) · Bulk generation (Pro+) · White label (Agency) |
+| Features (**do NOT** check) | Dark Mode · Self-hosted · Offline use · No registration required · Open Source |
+| Languages | English |
+| Developer | Qravio · Bangalore, India · founded February 2026 · 1–10 people |
+| Contact | `support@qravio.app` |
+| Social | X `https://x.com/qravioapp` · LinkedIn `https://www.linkedin.com/company/qravioapp` |
+| Logo | `https://qravio.app/Icons/qravio_icon.png` (square PNG, verified 200) |
+| Screenshots | upload 4 — QR builder wizard · analytics dashboard · QR list/workspace · rendered vCard landing page in a phone frame (no public URLs exist; capture them) |
+| Video | none — skip |
+
+**Step 4 — suggest alternatives.** Confirmed live AlternativeTo pages:
+
+- QR Code Generator (Bitly/Egoditor) — `/software/qr-code-generator-com/`
+- QR Code Dynamic — `/software/qr-code-dynamic/`
+- QR.io — `/software/qr-io/`
+- QRTIGER — `/software/qrzebra-qr-code-generator/`
+
+Then search + add: Flowcode · Uniqode (Beaconstac) · QRCode Monkey · Bitly · Pageloot · Scanova · Me-QR. The first five mirror `competitors.ts`, so the listing and the on-site `/[x]-alternative` pages reinforce each other.
+
+**After approval (1–2 days) — this is where the actual value is.** The profile alone is one page. Go to each competitor's page and use *"Suggest an alternative"* → Qravio; that puts you on ~10 high-authority pages people browse. Also claim the profile via *"Are you the developer?"* and disclose maker status in the submission. **Never self-like from multiple accounts — AlternativeTo delists for it.**
+
+**Do not list yet** (built but not verified live in prod): restaurant menu QR · multilingual landing pages · WhatsApp review reminders · print-ready PDF export · business-card OCR. The description above deliberately excludes all five; add them only after the migrations are applied and the feature is confirmed on `qravio.app`.
+
+### 5b. Other directories (SaaSHub · Slant · SaaSworthy)
+
 | Field | Value |
 |---|---|
 | Name | `Qravio` |

@@ -10,19 +10,24 @@
 
 ---
 
-## ▶ RESUME HERE — progress snapshot (last worked: 2026-07-14)
+## ▶ RESUME HERE — progress snapshot (last worked: 2026-07-31)
 
 **Live / in `sameAs`:** X `qravioapp` · LinkedIn `qravioapp` · **Wikidata `Q140489820`** (⏳ still needs a `reference URL (P854)` on inception + official-website statements — add the Crunchbase URL once it's public).
-**Pending moderation (URLs to come):** **Crunchbase** (`/organization/qravio`, "no match found" publicly) · **G2** (✅ approved 2026-07-11, direct URL arriving by email) · **Capterra** (✅ **PUBLISHED 2026-07-14** — "your listing is live" email received; direct `/p/<id>/<name>/` URL NOT yet captured, so not yet in `sameAs`). ⚠️ Not yet Google-indexed and not on the popularity-sorted category first page as of 2026-07-14 (normal for a zero-review new listing) — could not independently confirm the public page; **grab the canonical URL from the Capterra dashboard** to unblock §8a wiring + the §B review-drive deep link.
+**Pending moderation (URLs to come):** **Crunchbase** (`/organization/qravio`, "no match found" publicly) · **G2** (✅ approved 2026-07-11, direct URL arriving by email) · **Capterra** (✅ **PUBLISHED 2026-07-14** — "your listing is live" email received; direct `/p/<id>/<name>/` URL NOT yet captured, so not yet in `sameAs`) · **AlternativeTo** (submitted 2026-07-31, slug `qravio` — see `BRAND_KIT.md §5a`).
 
-**Next actions, in order:**
-1. **AlternativeTo** — deferred to **Mon** (site heavy-load over the weekend). Log in w/ `support@qravio.app` → search "Qravio" → "add new application" → use the core block below → mark Qravio "alternative to" the 5 competitors.
-2. **Other directories** (same core block): **SaaSHub** (`saashub.com` → Submit a product) · **Slant** (`slant.co` → add Qravio as an option under "best QR code generator") · **SaaSworthy** (`saasworthy.com` → Add Product).
-3. **Build the happy-user list** for the review drive (unblocked now): export active users → segment happiest (high scan volume, repeat logins, support praise).
-4. **When G2 + Capterra URLs arrive** → paste to Claude → wire `COMPANY.g2`/`COMPANY.capterra` + `sameAs` (§8a); capture each "write a review" deep-link.
-5. **Fire the review drive** → `GEO_CONTENT_PACK.md §B` email → target 15–20+ honest reviews → then §8b `aggregateRating`.
-6. **Add Crunchbase URL as the Wikidata `P854` reference** once Crunchbase resolves publicly (anti-deletion).
-7. **Verify GetApp + Software Advice** picked up the Capterra listing — now actionable since Capterra published 2026-07-14 (allow a few days for propagation + Google indexing first; ⚠️ propagation may have changed — "Capterra now part of G2" per LinkedIn 2026).
+> 🔻 **`sameAs` regression, fixed 2026-07-31.** `COMPANY.crunchbase` shipped inside the live `Organization.sameAs` despite the "verify 200 first" comment beside it — production was publishing a profile link to a listing still in moderation, which is the opposite of the entity-confidence signal `sameAs` exists to send. It has been **removed** from `structured-data.ts` (the `COMPANY.crunchbase` constant stays, unused, ready to re-add). **Re-add rule, now written into the code comment: a URL enters `sameAs` when it resolves 200 logged-out — not when the listing is "approved", "submitted" or "published".**
+
+**Next actions, in order** *(the first two have been the blocking pair since 2026-07-14 — nothing downstream moves until they do)*:
+1. 🔒 **Capture the G2 + Capterra profile URLs** from each dashboard (~5 min each). They have been live and uncaptured for 2+ weeks. This one step unblocks §8a wiring, the §B review-drive deep links, and eventually §8b.
+2. 🔒 **Fire the review drive** → export active users → segment the happiest (high scan volume, repeat logins, support praise) → `GEO_CONTENT_PACK.md §B` founder email → target 15–20+ honest reviews. **Empty G2/Capterra profiles carry no GEO weight at all**; the reviews are the asset, the listing is just the container.
+3. **Other directories** (core block below): **SaaSHub** (`saashub.com` → Submit a product) · **Slant** (`slant.co` → add Qravio as an option under "best QR code generator") · **SaaSworthy** (`saasworthy.com` → Add Product). Field sheets in `BRAND_KIT.md §5b`.
+4. **Watch AlternativeTo moderation** → once `https://alternativeto.net/software/qravio/` resolves 200 **logged out**, wire `COMPANY.alternativeTo` + `sameAs` (§8a) and start the "suggest an alternative" pass on the 5 competitor pages.
+5. **When G2 + Capterra URLs land** → wire `COMPANY.g2`/`COMPANY.capterra` + `sameAs` (§8a).
+6. **Add Crunchbase URL as the Wikidata `P854` reference** once Crunchbase resolves publicly (anti-deletion) — and re-add it to `sameAs` in the same pass.
+7. **Verify GetApp + Software Advice** picked up the Capterra listing (⚠️ propagation may have changed — "Capterra now part of G2" per LinkedIn 2026).
+8. **Product Hunt launch** (§1) — still unstarted, still the highest-ceiling single item once §1 reviews exist. Launch kit is written (`GEO_CONTENT_PACK.md §A`).
+
+> 📊 **Also unstarted and free: the GSC indexation check.** The on-page strategy's first prescribed action was Search Console → Pages report, to confirm the ~140 programmatic pages are actually *indexed* rather than "Crawled — currently not indexed". No record of it having been run. Off-site authority work cannot pay off on pages Google has not indexed, so this is the cheapest way to find out whether the bottleneck is authority or indexation.
 
 **Reusable directory core block:**
 ```
@@ -111,7 +116,7 @@ These are the structured sources Google's Knowledge Graph and LLMs ingest direct
 
 Your on-site wedge is the `/[x]-alternative` + `/vs/[competitor]` cluster. These directories are where users *and* LLMs go for "alternatives to Flowcode/QR Tiger/Uniqode" — getting Qravio listed there with the free-tier hook compounds that wedge.
 
-- [ ] **AlternativeTo** (alternativeto.net) — add Qravio as an alternative to: flowcode, qr-tiger, uniqode, qr-code-generator.com, qrcode-monkey. Tag *Free* + *Freemium*.
+- [~] **AlternativeTo** (alternativeto.net) — **SUBMITTED 2026-07-31**, slug confirmed `qravio` → `https://alternativeto.net/software/qravio/`. ⏳ **Pending moderation: logged-out the URL does not serve, so Google cannot crawl it yet.** Full submission set (deliberately non-promotional copy — their editors reject the §0 adjectives) in `BRAND_KIT.md §5a`. **Blocked until it publishes:** adding it to `sameAs`, and the "suggest an alternative" pass marking Qravio an alternative to flowcode, qr-tiger, uniqode, qr-code-generator.com, qrcode-monkey (an unpublished app cannot be suggested).
 - [ ] **SaaSHub** (saashub.com) — listing + position as alternative to the same five.
 - [ ] **Slant** (slant.co) — add Qravio to "best QR code generator" question(s).
 - [ ] **SaaSworthy** (saasworthy.com) — listing.
@@ -164,10 +169,10 @@ Earns referring domains (DR growth KPI) — the thing that actually closes the a
 Two edits, both in the frontend, both already scaffolded:
 
 ### 8a — Add every live profile URL to `Organization.sameAs`
-- File: `qr_frontend/src/lib/seo/structured-data.ts:41`
-- Currently: `sameAs: [COMPANY.twitter, COMPANY.linkedin]`
-- Action: as each profile in §1–§4 goes live, append its canonical URL. Cleanest: add fields to `COMPANY` in `qr_frontend/src/lib/constants/company.ts` (e.g. `g2`, `capterra`, `productHunt`, `crunchbase`, `wikidata`, `alternativeTo`) and spread them into `sameAs`.
-- Rule: **only add URLs that resolve 200 and are branded** — never a 404 or an empty stub.
+- File: `qr_frontend/src/lib/seo/structured-data.ts` (`buildOrganizationLd`)
+- Currently: `sameAs: [COMPANY.twitter, COMPANY.linkedin, COMPANY.wikidata]` — Crunchbase was **removed 2026-07-31** after shipping to production while still in moderation (see the RESUME HERE note).
+- Action: as each profile in §1–§4 goes live, append its canonical URL. Cleanest: add fields to `COMPANY` in `qr_frontend/src/lib/constants/company.ts` (e.g. `g2`, `capterra`, `productHunt`, `alternativeTo`) and spread them into `sameAs`.
+- Rule: **only add URLs that resolve 200 logged-out** — never a 404, an empty stub, or a listing that is merely "approved". Check it in a private window, from the public internet, before the line lands. This rule was already written in the code comment and was still violated once, which is why the check is now spelled out as *logged-out 200*, not *approved*.
 
 ### 8b — Pass real `aggregateRating` to SoftwareApplication
 - The option is already wired: `buildSoftwareApplicationLd({ aggregateRating })` (`structured-data.ts:68/127`).
