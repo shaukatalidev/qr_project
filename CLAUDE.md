@@ -200,6 +200,58 @@ by `src/utils/locale.js` after the status/schedule/password branches, so system 
 A monolingual QR (`i18n` absent, or one locale) must stay **byte-for-byte identical** to pre-feature
 output; `src/i18n/templates.test.mjs` asserts that and is the regression to protect.
 
+### Integration tests (`qr_cf_code/src/integration/`)
+
+Every other Worker test imports one module and checks its output. `src/integration/` drives the
+**real `src/index.js` fetch handler** over a fake KV binding and a `fetch` recorder — no miniflare,
+no wrangler, since the default export is a plain `fetch(request, env, ctx)` and Node supplies
+Request/Response. `harness.mjs` is the whole runtime; `scanFlow.test.mjs` covers routing, the
+status/schedule gates, custom-domain tenant isolation, locale resolution and the deferred scan POST.
+
+Two things it pins are invariants, not cosmetics: a page that served **no content must never POST
+`/internal/scans`** (the backend counts that table per workspace with no type filter, so a blocked
+scan burns the billable cap and, once tripped, disables every other QR that workspace owns), and a
+custom hostname must **refuse short codes from other workspaces**.
+
+When adding to the harness, note that `ctx.waitUntil` needs draining until it stops growing —
+callers fire `recordScan` without awaiting it, and it awaits two crypto digests before deferring,
+so a single `Promise.all` finds an empty list and the POST surfaces during the *next* test.
+
+**Backend↔Worker KV contract**: `build_kv_content()` (backend) writes the blob the Worker renders
+from, and the two repos could only ever test against hand-written fakes of each other. The backend
+now generates `kv_contract.json` from the real function; `qr_cf_code` keeps a byte-identical copy
+and feeds every payload through the real Worker. Same arrangement as `keys.json`, same reason.
+After any change to `build_kv_content` or a scan-page reader:
+
+```bash
+cd qr_backend && UPDATE_KV_CONTRACT=1 pytest tests/integration_tests/test_kv_contract.py
+cp tests/integration_tests/kv_contract.json ../qr_cf_code/src/integration/
+./scripts/check-kv-contract-parity.sh   # manual pre-merge step; no CI job sees both repos
+```
+
+### Tests that need a monorepo checkout
+
+Two frontend tests read their sibling repos off disk rather than through a checked-in
+artefact: `maps-mirror.test.ts` imports `qr_cf_code/src/utils/maps.js` to prove both
+implementations build identical map URLs, and `location-templates.test.ts` reads the Worker
+dispatcher and the backend KV shim to prove all three agree on the default `templateId`.
+
+GitHub Actions clones one repo, so both **skip** there — `vitest.config.ts` aliases the
+absent sibling to a stub so the import resolves, and the tests skip on the same condition.
+A static cross-repo import instead fails at transform time and takes the whole file down,
+which is how the frontend's first CI run went red.
+
+Skipping is not passing. Run them before merging anything that touches maps or location
+templates — the script fails if they skip rather than reporting a vacuous pass:
+
+```bash
+./scripts/check-cross-repo-mirrors.sh
+```
+
+Prefer the `keys.json` / `kv_contract.json` pattern for NEW cross-repo checks: a generated
+artefact committed to both repos keeps each repo's own CI meaningful. Reaching across the
+filesystem only works on a developer's machine.
+
 ## Key Data Flow
 
 ```

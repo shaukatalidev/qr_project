@@ -9,6 +9,8 @@ coverage
 qr_frontend/
 qr_backend/
 qr_cf_code/
+qr_admin/
+supabase/ 
 .openclaw/
 
 competitor/
