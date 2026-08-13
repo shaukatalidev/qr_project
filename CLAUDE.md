@@ -17,38 +17,120 @@ QR Code SaaS monorepo with three independent services:
 python -m uvicorn src.main:backend_app --reload --host 0.0.0.0 --port 8000
 pytest
 pytest --cov=src --cov-report=html
-black src/ tests/ && isort src/ tests/
+black src/ tests/ && isort src/ tests/    # line-length 119 — running bare `black` uses
+                                          # its 88-col default and reformats the world
 mypy src/
 docker-compose up -d
 ```
+
+### Tests
+
+Two tiers, and the distinction is load-bearing:
+
+- **`tests/unit_tests/`** (~1,120) — import a route coroutine and `await` it directly,
+  passing `user_id="u1"`, `member={"role": "owner"}` as plain kwargs. Auth, routing and
+  serialisation never run. Fast, and the right place for logic.
+- **`tests/integration_tests/`** (~33) — drive the **real ASGI stack** via the
+  `async_client` / `anonymous_client` fixtures in `tests/conftest.py`, so the Bearer
+  middleware, dependency resolution and response models are actually exercised. Auth is
+  real: `make_access_token()` mints an HS256 token the middleware verifies offline against
+  `SUPABASE_JWT_SECRET` from the committed `.env.test`. Inject a database with
+  `use_fake_db(FakeDB({...}))`.
+
+**New tests must not need Postgres.** CI (`.github/workflows/ci.yml`) runs bare `pytest`
+with no database service, so a DB-backed test *skips* there — and a skip is
+indistinguishable from a pass in a green run. `tests/integration_tests/conftest.py`'s
+`requires_db` marks the few that genuinely need the local stack.
+
+Use the shared double in **`tests/fakes/`** (`FakeDB`) rather than writing a new one. It
+applies `.eq()` filters and journals operation order, which a `MagicMock` cannot: a mock
+returns a truthy row whatever you ask it for, so a tenancy assertion passes with or without
+the filter that makes it true. Note `maybe_single()` returns a **dict or `None`**, matching
+PostgREST — not a one-element list.
 
 ### Architecture
 
 **Entry point**: `src/main.py` — FastAPI app factory with lifespan, CORS middleware, and `BearerTokenAuthMiddleware`.
 
-**Request lifecycle**: CORSMiddleware → `BearerTokenAuthMiddleware` (calls `supabase.auth.get_user(token)` on every request, attaches `user_id` to `request.state`) → router → dependency injection → handler.
+**Request lifecycle**: `RequestMiddleware` (mints `request.state.request_id`, logs the one structured line the app emits) → CORSMiddleware → `BearerTokenAuthMiddleware` → router → dependency injection → handler.
+
+`BearerTokenAuthMiddleware` verifies the JWT **locally** against `SUPABASE_JWT_SECRET` (HS256) and only falls back to `supabase.auth.get_user(token)` when that is impossible — secret unset, a non-HS256 token, or a bad signature. So the common path makes **no network call**. It attaches `user_id`, `user_email`, `user_role` and `supabase_user` to `request.state`. An expired-but-well-formed token is rejected immediately without the fallback.
 
 **Auth dependencies** (`src/api/dependencies/`):
 - `get_current_user_id()` — reads from `request.state`
 - `get_workspace_role(workspace_id, user_id)` — DB lookup on `workspace_members`
 - `require_can_read/create/update/delete` — raise 403 if role insufficient (viewer=1, editor=2, owner=3)
 
-**Public routes** (bypass Bearer auth, defined by exclusion in `auth_bearer.py`):
-- `POST /api/v1/auth/register|login|forgot-password|verify-otp`
-- `GET /api/v1/health`
-- `POST /api/v1/internal/*` — protected by `x-internal-secret` header instead
-- `POST /api/v1/razorpay/webhook`
+**The API prefix is `/api`, NOT `/api/v1`.** Hardcoded at `src/config/settings/base.py:26`
+(`API_PREFIX`), not env-driven. Every app route is `/api/<router-prefix>/…` — e.g.
+`/api/workspaces/`, `/api/health/`, `/api/internal/kv-sweep`. The **only** paths carrying a
+`v1` are the public developer API and the public report reader, which mount their own
+absolute prefix `/api/public/v1/…` and do not sit under `API_PREFIX`.
+
+**Public routes** — the exclusion list is passed to the middleware in `main.py`
+(prefix-matched), not defined inside `auth_bearer.py`. Adding a route here is the only way
+to make it reachable without a Bearer token, so the full list is worth knowing:
+
+| Path prefix | What guards it instead |
+|---|---|
+| `/api/razorpay/webhooks` | Razorpay HMAC signature |
+| `/api/mor/webhooks` | Merchant-of-Record signature |
+| `/api/bsp/webhook/` | per-workspace BSP HMAC |
+| `/api/security/deletion/cancel` | HMAC-signed token from the deletion email (the account has no live session by design) |
+| `/api/health`, `/health/live`, `/health/ready` | nothing — liveness probes |
+| `/api/internal/` | `x-internal-secret` header (`verify_internal_secret`) |
+| `/api/public/plans` | nothing — anonymous pricing page |
+| `/api/public/v1` | API key, not JWT (`api_key_auth`) |
+| `/docs`, `/redoc`, `/openapi.json` | nothing |
+
+There are **no** `register` / `login` / `forgot-password` / `verify-otp` endpoints — signup
+and login happen against Supabase directly from the frontend. The backend's only auth route
+is `POST /api/auth/verify-user`, which resolves an already-authenticated user (and creates
+their first workspace on first login). It is **not** public; it requires a Bearer token.
 
 **Database**: Supabase REST client (not SQLAlchemy despite it being in requirements). All queries use the `supabase-py` fluent API: `db.table("x").select("*").eq("id", id).execute()`. The service role key is used (bypasses RLS). Client is a lazy-initialized singleton in `src/database/supabase.py`.
 
 **Config**: `ENVIRONMENT` env var (not `APP_ENV`) selects the settings class via `src/config/manager.py` — `DEV`/`STAGE`/`PROD` plus the long forms (`development`, `staging`, `production`), case-insensitive; anything unrecognized resolves to production. Settings singleton imported as `from src.config.manager import settings`. On startup `settings.validate_public_urls()` refuses to boot outside development if `QR_DYNAMIC_URL`/`PUBLIC_API_URL`/`FRONTEND_URL`/`SITE_URL` still hold localhost defaults — these get published (into QR pixels and emails), so set them per environment before deploying.
 
-**Cloudflare KV sync** (`src/utilities/cloudflare_kv.py`): Every QR write calls `write_to_kv()` synchronously after the DB write. `build_kv_content(qr_id, qr_type, db)` fetches type-specific content (vcard fields, file paths, event data, etc.) and packages it for the Worker. If the KV write fails, it raises `RuntimeError` — there is no retry.
+**Cloudflare KV sync** — two modules, and the split matters:
 
-**Key files by size/complexity**:
-- `src/api/routes/qr.py` (~1400 lines) — all QR CRUD, KV sync, file attachment logic. `SELECT_WITH_RELATIONS` string at line ~819 joins all related tables in one query.
-- `src/api/routes/razorpay_routes.py` (~977 lines) — billing lifecycle and webhook handler.
-- `src/api/routes/internal.py` — Worker-only endpoints (no Bearer auth).
+- `src/utilities/cloudflare_kv.py` — the transport and the payload builders.
+  `build_kv_content(qr_id, qr_type, db)` assembles the type-specific content block;
+  `sync_qr_to_kv(qr_id, db)` is the canonical DB→KV publish. All four HTTP helpers go
+  through `_kv_request`, which applies `timeout=30`, retries **3 times** (0.5s then 2.0s)
+  on transport errors / 429 / 5xx, and never retries other 4xx. Failures raise **`KVError`**,
+  and `build_kv_content` raises **`KVContentError`** — both subclass `RuntimeError` so
+  existing `except RuntimeError` handlers keep working *and* now also catch what used to be
+  an uncaught `httpx.ConnectError`. `build_kv_content` raises for **every** type rather than
+  degrading to `{}`: `write_to_kv` is a full PUT, so an empty write destroys a working KV
+  value, while skipping the write preserves the last-good one.
+- `src/utilities/kv_sync.py` — durability. **Call `publish_qr(qr_id, db)`, not
+  `sync_qr_to_kv`, from any write path**: it records the outcome on the `qr_codes` row
+  (`kv_sync_status` / `kv_attempt_count` / `kv_next_attempt_at` / `kv_last_error`, migration
+  0049) and **never raises**. `POST /internal/kv-sweep` re-publishes flagged rows on a cron
+  tick, with backoff, a dead-letter cap and a circuit breaker; `GET /admin/abuse/kv-unsynced`
+  lists what is currently broken.
+
+These helpers are **synchronous and blocking**. Called from an `async def` handler they must
+be wrapped: `await run_in_threadpool(publish_qr, str(qr_id), db)`. A test enforces this —
+`test_no_blocking_kv_call_survives_in_an_async_handler` walks the AST of every route module.
+
+**Key files by size** (they drift; re-measure before trusting):
+- `src/api/routes/internal.py` (~2,100) — Worker-only endpoints, `x-internal-secret` guarded.
+- `src/api/routes/scan.py` (~2,050) — scan recording and analytics reads.
+- `src/api/schemas/qr.py` (~1,860) — the 74 QR request/response models + pure validators.
+- `src/core/qr/service.py` (~1,760) — `create_qr` / `update_qr` orchestration. Still two very
+  long functions (950 / 711 lines); they were relocated out of the route layer, not split.
+- `src/api/routes/razorpay_routes.py` (~1,400) — billing lifecycle and webhook handler.
+- `src/api/routes/qr.py` (~1,320) — the QR endpoints, now thin. Re-exports names from
+  `src/api/schemas/qr.py` and `src/core/qr/rows.py` so existing imports keep resolving.
+- `src/core/qr/rows.py` (~930) — row↔response translation, `SELECT_WITH_RELATIONS`, menu row
+  building, short-code minting.
+
+**When moving a handler between modules**, repoint its tests' `patch.object` targets in the
+same commit. Patching the module a handler *used* to live in is a silent no-op, not an error
+— `conftest.py` installs a guard that fails any test reaching the real Cloudflare API,
+because the consequence is CI issuing live DELETEs against the production KV namespace.
 
 ## Frontend (`qr_frontend`)
 
