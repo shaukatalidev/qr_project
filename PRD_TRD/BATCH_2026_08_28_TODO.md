@@ -19,7 +19,7 @@ spec — they are the same column, the same KV field, the same Worker branch.
 | 2 | Duplicate QR button | ✅ **SHIPPED 08-29** | [`DONE/DUPLICATE_QR_PRD.md`](DONE/DUPLICATE_QR_PRD.md) · [TRD](DONE/DUPLICATE_QR_TRD.md) — see TRD §0 | none | BE, FE |
 | 3 | Change history for a QR | **NEW** | [`NOT_DONE/QR_CHANGE_HISTORY_PRD.md`](NOT_DONE/QR_CHANGE_HISTORY_PRD.md) · [TRD](NOT_DONE/QR_CHANGE_HISTORY_TRD.md) | `0055` | BE, FE |
 | 4 | Offline detection | **NEW** | [`NOT_DONE/OFFLINE_DETECTION_PRD.md`](NOT_DONE/OFFLINE_DETECTION_PRD.md) · [TRD](NOT_DONE/OFFLINE_DETECTION_TRD.md) | none | FE |
-| 5+6 | Per-QR scan limit / expiry by scan count | **NEW** (plan-level `max_scans` exists; per-QR cap does not) | [`NOT_DONE/PER_QR_SCAN_LIMIT_PRD.md`](NOT_DONE/PER_QR_SCAN_LIMIT_PRD.md) · [TRD](NOT_DONE/PER_QR_SCAN_LIMIT_TRD.md) | `0056` | BE, Worker, FE |
+| 5+6 | Per-QR scan limit / expiry by scan count | ✅ **SHIPPED 08-29** | [`DONE/PER_QR_SCAN_LIMIT_PRD.md`](DONE/PER_QR_SCAN_LIMIT_PRD.md) · [TRD](DONE/PER_QR_SCAN_LIMIT_TRD.md) — see TRD §0 | `0056` **unapplied** | BE, Worker, FE |
 | 7 | UTM campaign support | **NEW** (campaign *tags* shipped; UTM injection did not) | [`NOT_DONE/UTM_CAMPAIGN_SUPPORT_PRD.md`](NOT_DONE/UTM_CAMPAIGN_SUPPORT_PRD.md) · [TRD](NOT_DONE/UTM_CAMPAIGN_SUPPORT_TRD.md) | `0057` | BE, Worker, FE |
 | 8 | QR templates by industry | **NEW** (templates exist, keyed by *aesthetic*, not industry) | [`NOT_DONE/INDUSTRY_QR_TEMPLATES_PRD.md`](NOT_DONE/INDUSTRY_QR_TEMPLATES_PRD.md) · [TRD](NOT_DONE/INDUSTRY_QR_TEMPLATES_TRD.md) | none | FE |
 | 9 | Tooltips onboarding | **NEW** | [`NOT_DONE/ONBOARDING_TOOLTIPS_PRD.md`](NOT_DONE/ONBOARDING_TOOLTIPS_PRD.md) · [TRD](NOT_DONE/ONBOARDING_TOOLTIPS_TRD.md) | none (v1) | FE |
@@ -103,6 +103,7 @@ first drafts. They are recorded here because each one would have cost real time 
 | 11 — Review-funnel responses + the paywall bug | ✅ merged | `qr_backend#63`, `qr_frontend#86`, Worker `cdc14e9` |
 | 1 — `/reports` theme + schedule detail page | ✅ merged | `qr_frontend#86` |
 | 2 — Duplicate QR | ✅ pushed, PRs open | `feat/duplicate-qr` in `qr_backend` + `qr_frontend` |
+| 5+6 — Per-QR scan limit | ✅ pushed, PRs open | `feat/per-qr-scan-limit` in all three repos. **Migration 0056 unapplied. Deploy the WORKER first.** |
 
 ### What building #2 taught us about the specs
 
@@ -127,3 +128,23 @@ remaining six items, because every one of them was written the same way:
 - **Some hazards are only reachable through the new feature.** Duplicating a menu QR would have
   hard-failed on the original's primary keys, and shared menu photo paths meant deleting either
   QR destroyed the other's images. Neither is visible from reading the create path alone.
+
+### What building #5+6 added to the pattern list
+
+The five patterns above all held. Two more, both from specs describing a world that had
+moved on:
+
+- **A risk written in a spec is a claim, not a fact.** Both of this feature's headline
+  risks — the `outside_hours` reason being silently dropped, and bots being charged against
+  `max_scans` — were **already fixed** before the spec was written up. The code comments
+  narrating each bug are in the past tense and read as current, which is how a stale warning
+  survives a re-read. Check the claim before planning around it; the remaining specs
+  (`UTM_CAMPAIGN_SUPPORT`, `QR_CHANGE_HISTORY`) cite the same two.
+- **Look one layer further out than the spec does.** The feature was about a vocabulary
+  drifting between the DB and the endpoint. The same vocabulary had *also* drifted in the
+  READER — `get_qr_blocked_scans` bucketed a hand-written two of the four reasons, so two
+  years of `outside_hours` counts were stored and never shown. Nothing in the spec pointed
+  there.
+- **Check whether the UI string you are adding already exists.** "Scan limit reached" was
+  already the label for the *workspace* quota, so the new per-QR badge would have shipped as
+  a second identical label meaning something else on the same screen.

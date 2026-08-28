@@ -1,9 +1,89 @@
 # TRD — Per-QR scan limit
 
-**Spec:** `PER_QR_SCAN_LIMIT_PRD.md` · **Status:** Draft (detailed) · **Date:** 2026-08-28
+**Spec:** `PER_QR_SCAN_LIMIT_PRD.md` · **Status:** SHIPPED 2026-08-29 (see §0) · **Date:** 2026-08-28
 **Migration slot (RESERVATION):** `0056_qr_scan_limit.sql`. Highest on disk when written: `0054`. **`ls qr_backend/migrations/` and take the next free integer; re-confirm the highest APPLIED number in the DB.**
 **Repos:** `qr_backend`, `qr_cf_code`, `qr_frontend`. **KV payload changes → regenerate `kv_contract.json` and run the parity script.**
 **New plan flags:** none. **New `FEATURE_ENFORCEMENT` entries:** none.
+
+---
+
+## 0. AS BUILT — 2026-08-29
+
+Shipped as `feat/per-qr-scan-limit` in all three repos. **Read this before anything below
+it.** The core design — backend counts, edge enforces a boolean, no new status value —
+survived intact and needed no revision. What follows are the places the spec described a
+world that no longer exists, and two hazards it did not know about.
+
+### The two headline risks were already fixed
+
+| Spec claim | Reality |
+|---|---|
+| TRD §3.4 / PRD §10, presented as the highest-risk item: *"'outside_hours' has been rejected here since the daily-window feature shipped… the Worker has been POSTing it and silently having it dropped"* | **Fixed before this feature.** `internal.py` accepts all four reasons today. The comment above the check narrates the bug in the past tense and reads as though it is current — which is exactly how a stale warning survives. The **lockstep discipline still applies**, and the guard below is real, but nothing was re-fixed. |
+| PRD G5 / TRD §3.2: *"the known live bug in which bots are hidden from analytics but ARE charged against `max_scans` — do not inherit it"* | **Also fixed**, by `src/utilities/scan_counting.py`. Every quota path now routes through `count_billable_scans` (`subscription.py:444`, `internal.py:642`, `internal.py:716`). |
+
+Both were true when the specs were drafted. Neither was checked before they were written up
+as live risks, and both would have sent an implementer looking for a bug that was not there.
+
+### The count-source dilemma was already solved, in the same function
+
+TRD §3.2 requirement 2 presents an open choice between the cheap-but-lossy
+`qr_scan_counters` and the accurate-but-expensive `qr_scan_events`, and asks the implementer
+to "choose deliberately and document it". **`check_scan_milestones` — called forty lines
+below the new call site — had already solved it**: use the counter as a cheap GATE and pay
+for an accurate `count(*)` only once the gate clears. That shape was copied verbatim, and
+the docstring says where it came from.
+
+The gate under-counting is safe (it delays the check to a later scan, and the accurate count
+then decides); over-counting is impossible, because a lost read-modify-write only ever loses.
+
+### Two hazards the spec did not know about
+
+**`get_qr_blocked_scans` was dropping two of the four reasons.** It bucketed a hand-written
+`{"not_yet_live", "expired"}`, so `outside_hours` (0048) and `unclaimed_expired` (0052) were
+counted by the edge, stored by the DB, and then discarded on the way out — `total`
+under-reported and daily-window blocks were never shown to owners at all. The same drift the
+feature is about, one layer further out. Now derived from the allowlist, with a test.
+
+**The "Limit reached" badge name was already taken.** `getStatusMeta` returned the label
+**"Scan limit reached"** for `status === 'disabled'` — the WORKSPACE's monthly billing
+quota, rendered on an individual QR row in words that sound per-QR. Shipping PRD §5.3's
+badge as specified would have put two identical labels with opposite meanings on the same
+screen. The workspace one is now "Workspace limit".
+
+### Corrections
+
+| # | Section | Correction |
+|---|---|---|
+| 1 | §4 | **The KV contract does not apply.** `kv_contract.json` covers only the per-type `content` sub-object; `scan_limit` / `scan_limit_reached` are top-level siblings of it. No regeneration, and the parity script would not have caught drift on them. The §8.3 select-coverage assertion is the control that does. |
+| 2 | §5.1 | The branch goes **between** the absolute window and the daily window, not after both. A cap is permanent; "closed, opens again at 09:30" promises a reopening that is never coming. |
+| 3 | §6 | *"RHF + zod"* — `schedule-card.tsx`, the file the TRD says to model on, uses local `useState` + a plain validator. Matched the sibling. |
+| 4 | §6 | *"progress bar in `performance-panel.tsx`"* — that panel has no progress bar. Reused `ui/progress.tsx` with the `ApiUsageMeter` idiom. |
+| 5 | §3.2 | `record_scan_event` does not read the `qr_codes` row at all (the `workspace_id` lookup is conditional and rarely runs), so the check pays for its own single indexed read. |
+| 6 | §8.1 | The lockstep test does **not** parse the Worker from `qr_backend`. Two of the three places live in this repo and they are the two that drifted, so the primary guard works inside one repo's CI; the cross-repo leg uses a checked-in `blocked_reasons.json` and a parity script. |
+
+### Decisions taken at build time
+
+* **`scan_limit` is on the public API** (PRD §12 Q3). It rides along for free —
+  `api_public.py` reuses `QRCodeCreate`/`QRCodeUpdate` — so excluding it would have been
+  deliberate extra work.
+* **No webhook** (PRD §12 Q4). `scan.milestone` is Agency-only with fixed global thresholds
+  `[100, 1000, 10000]`, so a per-QR cap cannot reuse it; it would be a new event type.
+  Sequenced as a follow-up.
+* **`getStatusMeta` takes one lifecycle argument, not two.** Every caller passes the same
+  `qr` object, and `getStatusMeta(qr.status, qr, qr)` reads like a mistake.
+* **The builder control shares the Schedule accordion** rather than adding a step. "When
+  does this stop working" is one question on two axes.
+
+### Both new guards were verified by breaking them
+
+A guard that cannot fail is worse than no guard, so each was checked by simulating the exact
+historic drift and confirming it failed with the offending name:
+
+* removing `outside_hours` from the Python allowlist → *"accepted by the DB but not Python:
+  ['outside_hours']"*;
+* removing `scan_limit_reached_at` from `sync_qr_to_kv`'s select → *"sync_qr_to_kv reads
+  ['scan_limit_reached_at'] off the QR row but does not select them"*.
+
 
 ---
 

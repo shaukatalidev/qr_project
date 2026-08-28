@@ -1,6 +1,7 @@
 # PRD — Per-QR scan limit (scan cap + expiry by scan count)
 
-**Status:** Draft (detailed) · **Author:** Product · **Date:** 2026-08-28
+**Status:** SHIPPED 2026-08-29 · **Author:** Product · **Date:** 2026-08-28
+**As built:** see `PER_QR_SCAN_LIMIT_TRD.md` §0 — the two headline risks (§10's `outside_hours` drop, G5's bot-billing bug) were already fixed before this shipped, and §5.3's badge name collided with an existing one.
 **Covers requested items 5 ("QR scan limit") and 6 ("expiry by scan count") as one feature.** They are the same column, the same KV field, the same Worker branch position and the same system page. Specified apart they would contradict each other on the first edit.
 **Priority:** Parity checkbox plus a genuine SMB use case (limited-redemption offers). Reuses the shipped expiry machinery end to end, so the marginal cost is small and the review lessons are already paid for.
 **Tiers:** **All plans, ungated**, matching `QR_EXPIRY_SCHEDULING`'s posture and the house line established by `0027` (all QR types opened) and `0028` (folders opened). Zero COGS.
