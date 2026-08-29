@@ -20,7 +20,7 @@ spec — they are the same column, the same KV field, the same Worker branch.
 | 3 | Change history for a QR | **NEW** | [`NOT_DONE/QR_CHANGE_HISTORY_PRD.md`](NOT_DONE/QR_CHANGE_HISTORY_PRD.md) · [TRD](NOT_DONE/QR_CHANGE_HISTORY_TRD.md) | `0055` | BE, FE |
 | 4 | Offline detection | **NEW** | [`NOT_DONE/OFFLINE_DETECTION_PRD.md`](NOT_DONE/OFFLINE_DETECTION_PRD.md) · [TRD](NOT_DONE/OFFLINE_DETECTION_TRD.md) | none | FE |
 | 5+6 | Per-QR scan limit / expiry by scan count | ✅ **SHIPPED 08-29** | [`DONE/PER_QR_SCAN_LIMIT_PRD.md`](DONE/PER_QR_SCAN_LIMIT_PRD.md) · [TRD](DONE/PER_QR_SCAN_LIMIT_TRD.md) — see TRD §0 | `0056` **unapplied** | BE, Worker, FE |
-| 7 | UTM campaign support | **NEW** (campaign *tags* shipped; UTM injection did not) | [`NOT_DONE/UTM_CAMPAIGN_SUPPORT_PRD.md`](NOT_DONE/UTM_CAMPAIGN_SUPPORT_PRD.md) · [TRD](NOT_DONE/UTM_CAMPAIGN_SUPPORT_TRD.md) | `0057` | BE, Worker, FE |
+| 7 | UTM campaign support | ✅ **SHIPPED 08-29** (redirect only; landing-page CTAs deferred) | [`DONE/UTM_CAMPAIGN_SUPPORT_PRD.md`](DONE/UTM_CAMPAIGN_SUPPORT_PRD.md) · [TRD](DONE/UTM_CAMPAIGN_SUPPORT_TRD.md) — see TRD §0 | `0057` **unapplied** | BE, Worker, FE |
 | 8 | QR templates by industry | **NEW** (templates exist, keyed by *aesthetic*, not industry) | [`NOT_DONE/INDUSTRY_QR_TEMPLATES_PRD.md`](NOT_DONE/INDUSTRY_QR_TEMPLATES_PRD.md) · [TRD](NOT_DONE/INDUSTRY_QR_TEMPLATES_TRD.md) | none | FE |
 | 9 | Tooltips onboarding | **NEW** | [`NOT_DONE/ONBOARDING_TOOLTIPS_PRD.md`](NOT_DONE/ONBOARDING_TOOLTIPS_PRD.md) · [TRD](NOT_DONE/ONBOARDING_TOOLTIPS_TRD.md) | none (v1) | FE |
 | 10 | Feature request board | **NEW** | [`NOT_DONE/FEATURE_REQUEST_BOARD_PRD.md`](NOT_DONE/FEATURE_REQUEST_BOARD_PRD.md) · [TRD](NOT_DONE/FEATURE_REQUEST_BOARD_TRD.md) | `0058` | BE, FE |
@@ -103,7 +103,9 @@ first drafts. They are recorded here because each one would have cost real time 
 | 11 — Review-funnel responses + the paywall bug | ✅ merged | `qr_backend#63`, `qr_frontend#86`, Worker `cdc14e9` |
 | 1 — `/reports` theme + schedule detail page | ✅ merged | `qr_frontend#86` |
 | 2 — Duplicate QR | ✅ pushed, PRs open | `feat/duplicate-qr` in `qr_backend` + `qr_frontend` |
-| 5+6 — Per-QR scan limit | ✅ pushed, PRs open | `feat/per-qr-scan-limit` in all three repos. **Migration 0056 unapplied. Deploy the WORKER first.** |
+| 5+6 — Per-QR scan limit | ✅ backend + FE merged; **Worker PR still open** | `feat/per-qr-scan-limit`. 0056 IS applied on hosted. ⚠️ The Worker commit is unmerged, so the flag is published but not enforced. |
+| — | Open redirect on `/click/:linkId` | ✅ pushed, PRs open | `fix/link-click-open-redirect` in `qr_backend` + `qr_cf_code`. Found while scoping item 7. |
+| 7 — UTM campaign support | ✅ pushed, PRs open | `feat/utm-campaign-support` in all three repos. **Migration 0057 unapplied. Deploy the WORKER first.** |
 
 ### What building #2 taught us about the specs
 
@@ -128,6 +130,26 @@ remaining six items, because every one of them was written the same way:
 - **Some hazards are only reachable through the new feature.** Duplicating a menu QR would have
   hard-failed on the original's primary keys, and shared menu photo paths meant deleting either
   QR destroyed the other's images. Neither is visible from reading the create path alone.
+
+### What building #7 added
+
+Two of them are new failure modes, not repeats:
+
+- **A migration in a spec is untested code.** `0057`'s key constraint, as written, does not
+  apply at all — `cannot use subquery in check constraint`, the identical defect that stopped
+  `0048`. Both were written the same way by the same reasoning, and neither was ever run.
+  **Run every migration a spec proposes against a real Postgres before planning around it**;
+  the failure mode is a half-finished release, not a review comment.
+- **A guard can be vacuous because of its own comment.** The test asserting `utm_content` is
+  named in `sync_qr_to_kv`'s destinations select passed with the column removed, because the
+  explanatory comment sitting inside the searched block contained the string it was grepping
+  for. It now parses the actual `.select()` literal. **Every new guard was checked by
+  simulating the drift it exists to catch** — that is the only reason this was found.
+
+And one repeat, louder: **check the spec's own "verify this" branches first.** §6.2 said to
+establish what validated `linkClick`'s target before building on it. Nothing did. It had been a
+live unauthenticated open redirect for the whole life of the `list_links` feature, and no part
+of the UTM work would have found it if the spec had not asked.
 
 ### What building #5+6 added to the pattern list
 

@@ -1,5 +1,38 @@
 # TRD — UTM campaign support
 
+## §0 — AS BUILT (2026-08-29)
+
+Shipped across `qr_backend`, `qr_cf_code` and `qr_frontend`. Migration **`0057`**.
+**Read this section before the rest of the document**: seven of its claims were wrong, and
+one of them would have failed the release at apply time.
+
+| # | The TRD said | What the code said |
+|---|---|---|
+| 1 | Migration `0057` guards the key set with `CHECK (utm IS NULL OR NOT EXISTS (SELECT 1 FROM jsonb_object_keys(utm) …))` | ⚠️ **That migration does not apply.** `ERROR: 0A000: cannot use subquery in check constraint`, reproduced against PG 17.6. It is the same defect that stopped `0048`, and it would have surfaced mid-rollout rather than in review. Shipped as `utm - ARRAY['source','medium','campaign','term','content'] = '{}'::jsonb`, which is subquery-free, with `jsonb_typeof` folded into the SAME constraint because CHECK ordering across constraints is not guaranteed and `jsonb - text[]` raises on a scalar. |
+| 2 | §4: "KV payload changes → regenerate `kv_contract.json` and run the parity script" | **Not applicable.** That contract is keyed by QR *type* (`business`, `list_links`, `menu`, `pdf`, `review_funnel`, `vcard`, `location`) and covers only the per-type **`content`** sub-object. `utm` and `destinations[]` are top-level siblings of `content`, so it neither covers them nor would catch drift on them. Identical to the correction the scan-limit build made. Nothing regenerated. |
+| 3 | §3.3: `create_qr` defaults `utm_campaign` from the QR's `campaign:` tag | **Impossible.** `create_qr` never touches tags — `service.py` says so in a comment written during the Duplicate build — and `QRCodeCreate` has no `tags` field. The builder does not set tags at create either. The "default from the campaign tag" branch would have been dead code, silently falling through to `slugify(name)` 100% of the time. |
+| 4 | §3.3: compute the defaults server-side at all | **Actively harmful, and this is the finding worth keeping.** `api_public.py:313,402` reuse `QRCodeCreate`/`QRCodeUpdate`, so a backend default would have started appending `utm_source`/`utm_medium`/`utm_campaign` to the destinations of every QR created by every existing **public API** integration — none of which asked for it. Defaults moved to the builder, where they are visible and editable before saving. `test_create_defaults_nothing_when_utm_is_absent` pins it. |
+| 5 | §6.1: apply "after `ensureScheme`" | **Three call sites, not one.** `websiteRedirect.js` has three independent return paths (routing rules, single/legacy/not-entitled, A/B sticky), each with its own `ensureScheme` → `record()` → return. And the merge must land **before `record()`**, or `qr_scan_events.destination_url` stores a URL that differs from the one the scanner received — making our analytics disagree with the customer's GA4 about where traffic went, which is the exact confusion the feature exists to end. |
+| 6 | §6.2: "establish what validates that target" before touching `linkClick` | ⚠️ **Nothing validated it.** `/click/:linkId?target=` 302'd to `decodeURIComponent(target)` unconditionally — an unauthenticated open redirect on the QR domain, needing no account and no QR. Fixed separately (`fix/link-click-open-redirect`, both repos) using the `/rr/` route's existing pattern: the target now comes back from `POST /internal/link-click/{id}`. `linkClick` stayed out of UTM v1 as the TRD recommended. |
+| 7 | §7 / G7: apply UTMs to landing-page CTAs and `list_links` items | **36 template files, ~66 dynamic hrefs** — an order of magnitude larger than the TRD implies, and most of those hrefs are `tel:`, `mailto:`, `data:` calendar files, map links and app-store links that must never be stamped. Scoped out of v1 by decision. `applyUtm` fails open on every one of them, so adopting them later is additive and needs no rework. |
+
+**Also built, beyond the spec:** `scripts/check-utm-parity.sh`. §7 recommended the committed-
+artefact pattern over the `maps.js` filesystem reach, and that is what shipped (`utm_cases.json`,
+23 cases, byte-identical in both repos, each asserting its own implementation). But nothing inside
+either repo can see the other's copy, so the tables silently drifting apart is the one failure
+neither suite catches — same blind spot as `keys.json` and `kv_contract.json`, same remedy.
+
+**Not built (v1.1):** landing-page CTAs and `list_links` (row 7), and `linkClick` UTMs (row 6,
+now unblocked since the target is trusted).
+
+**Verification.** 1478 backend tests; 32 Worker unit cases + 37 integration checks; 1323 frontend
+tests; mypy unchanged at its 3527 baseline; lint and build clean; `tsc` reports 0 errors.
+Both new cross-repo guards were checked against deliberately introduced drift and fail on it —
+including one that was **vacuous on the first attempt**, because an explanatory comment inside the
+searched block satisfied a substring check while the column was actually missing from the select.
+
+---
+
 **Spec:** `UTM_CAMPAIGN_SUPPORT_PRD.md` · **Status:** Draft (detailed) · **Date:** 2026-08-28
 **Migration slot (RESERVATION):** `0057_qr_utm_params.sql`. Highest on disk when written: `0054`. **`ls qr_backend/migrations/` and take the next free integer.**
 **Repos:** `qr_backend`, `qr_cf_code`, `qr_frontend`. **KV payload changes → regenerate `kv_contract.json` and run the parity script.**

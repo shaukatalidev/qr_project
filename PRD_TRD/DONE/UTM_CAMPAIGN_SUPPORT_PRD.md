@@ -1,5 +1,15 @@
 # PRD — UTM campaign support
 
+> ✅ **SHIPPED 2026-08-29** — migration `0057`, across all three repos.
+> **Scope delivered:** the `website` 302 (all three branches: plain, A/B, routing rules),
+> per-variant `utm_content`, the builder section with a live preview, and the detail-page card.
+> **Deferred to v1.1:** G7's landing-page CTAs and `list_links` items — 36 template files and
+> ~66 hrefs, most of which are `tel:`/`mailto:`/`data:`/map links that must never be stamped.
+> `applyUtm` fails open on all of them, so adopting them later is purely additive.
+> **Open question 4** ("should `/click` carry UTMs?") was answered by finding that route was an
+> **open redirect**; it is fixed separately and the answer is now "it can, safely, in v1.1".
+> See `../DONE/UTM_CAMPAIGN_SUPPORT_TRD.md` §0 for the seven spec claims the code contradicted.
+
 **Status:** Draft (detailed) · **Author:** Product · **Date:** 2026-08-28
 **Priority:** Parity checkbox with real pull. Every serious competitor ships a UTM builder, but the stronger argument is that this is the only way a customer sees QR traffic **inside their own GA4** — which is where their marketing decisions actually get made.
 **Tiers:** **All plans, ungated.** Zero COGS. Gating it pushes customers back to hand-typing UTM strings into the destination field, which is what they do today and what goes wrong (§2.2).
