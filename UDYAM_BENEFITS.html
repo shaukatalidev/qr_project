@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Qravio's Udyam Playbook</title>
+<style>
+:root{
+  --bg:#E9ECEC; --surface:#FAFBFB; --surface-2:#F1F4F3;
+  --ink:#131A19; --ink-2:#46524F; --ink-3:#6E7B78;
+  --rule:#CDD5D3; --rule-strong:#AFBBB8;
+  --accent:#14584A; --accent-soft:#DCE8E4; --accent-ink:#0D3F35;
+  --brass:#7E5A11; --brass-soft:#EFE6D0;
+  --flag:#8C2F2F; --flag-soft:#F1E2E1;
+  --serif:Georgia,"Iowan Old Style","Palatino Linotype","Book Antiqua","Times New Roman",serif;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1413; --surface:#151D1B; --surface-2:#1A2422;
+    --ink:#E8EEEC; --ink-2:#A9B7B3; --ink-3:#7B8A86;
+    --rule:#26332F; --rule-strong:#374742;
+    --accent:#5FBBA2; --accent-soft:#16302A; --accent-ink:#8FD6C1;
+    --brass:#D3AC5A; --brass-soft:#2C2415;
+    --flag:#E08A85; --flag-soft:#331F1E;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1413; --surface:#151D1B; --surface-2:#1A2422;
+  --ink:#E8EEEC; --ink-2:#A9B7B3; --ink-3:#7B8A86;
+  --rule:#26332F; --rule-strong:#374742;
+  --accent:#5FBBA2; --accent-soft:#16302A; --accent-ink:#8FD6C1;
+  --brass:#D3AC5A; --brass-soft:#2C2415;
+  --flag:#E08A85; --flag-soft:#331F1E;
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--sans); font-size:17px; line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1080px; margin:0 auto; padding:0 28px 96px}
+
+/* ---- masthead ---- */
+.mast{padding:64px 0 40px; border-bottom:2px solid var(--ink)}
+.eyebrow{
+  font-family:var(--mono); font-size:11.5px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--accent); margin:0 0 20px;
+  display:flex; flex-wrap:wrap; gap:0 14px;
+}
+.eyebrow span::after{content:"  ·"; color:var(--ink-3)}
+.eyebrow span:last-child::after{content:""}
+h1{
+  font-family:var(--serif); font-weight:700; font-size:clamp(38px,6.4vw,62px);
+  line-height:1.03; letter-spacing:-.018em; margin:0 0 22px; text-wrap:balance;
+}
+.standfirst{
+  font-family:var(--serif); font-size:clamp(18px,2.2vw,21px); line-height:1.55;
+  color:var(--ink-2); max-width:60ch; margin:0;
+}
+.standfirst strong{color:var(--ink); font-weight:700}
+
+/* ---- at a glance ---- */
+.glance{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(158px,1fr));
+  gap:1px; background:var(--rule); border:1px solid var(--rule);
+  margin:40px 0 0;
+}
+.gcell{background:var(--surface); padding:18px 20px 20px; display:flex; flex-direction:column; gap:6px}
+.gnum{
+  font-family:var(--serif); font-size:26px; font-weight:700; line-height:1;
+  font-variant-numeric:tabular-nums; color:var(--accent);
+}
+.glabel{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); line-height:1.4}
+
+/* ---- sections ---- */
+section{margin-top:72px}
+.sechead{display:flex; align-items:baseline; gap:16px; border-bottom:1px solid var(--rule-strong); padding-bottom:12px; margin-bottom:8px}
+.sectag{
+  font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--bg); background:var(--accent); padding:4px 9px; white-space:nowrap;
+}
+.sectag.warn{background:var(--flag)}
+h2{font-family:var(--serif); font-size:clamp(24px,3.2vw,31px); font-weight:700; letter-spacing:-.012em; margin:0; line-height:1.2}
+.secnote{font-size:15px; color:var(--ink-3); margin:14px 0 0; max-width:66ch}
+
+/* ---- entry: citation rail + body ---- */
+.entry{
+  display:grid; grid-template-columns:216px 1fr; gap:34px;
+  padding:32px 0; border-bottom:1px solid var(--rule);
+}
+.entry:last-child{border-bottom:0}
+.rail{display:flex; flex-direction:column; gap:12px}
+.authority{
+  font-family:var(--mono); font-size:11.5px; line-height:1.55; letter-spacing:.03em;
+  color:var(--ink-2); border-left:3px solid var(--accent); padding-left:11px;
+}
+.authority em{display:block; font-style:normal; color:var(--ink-3); letter-spacing:.09em; text-transform:uppercase; font-size:10px; margin-bottom:4px}
+.worth{
+  font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--brass); background:var(--brass-soft); padding:5px 9px; align-self:flex-start;
+}
+.ebody h3{font-family:var(--serif); font-size:23px; font-weight:700; margin:0 0 12px; line-height:1.25; letter-spacing:-.008em; text-wrap:balance}
+.ebody p{margin:0 0 14px; max-width:66ch}
+.ebody p:last-child{margin-bottom:0}
+.ebody ul{margin:0 0 14px; padding-left:0; list-style:none; max-width:66ch; display:flex; flex-direction:column; gap:9px}
+.ebody ul li{padding-left:20px; position:relative}
+.ebody ul li::before{content:""; position:absolute; left:2px; top:.62em; width:7px; height:1.5px; background:var(--accent)}
+code{font-family:var(--mono); font-size:.87em; background:var(--surface-2); padding:1.5px 5px; border:1px solid var(--rule); white-space:nowrap}
+strong{font-weight:650; color:var(--ink)}
+a{color:var(--accent-ink); text-decoration:underline; text-underline-offset:2px; text-decoration-thickness:1px}
+a:hover{text-decoration-thickness:2px}
+a:focus-visible{outline:2px solid var(--accent); outline-offset:3px}
+
+/* callout inside an entry */
+.pin{
+  background:var(--surface); border-left:3px solid var(--brass);
+  padding:14px 18px; margin:0 0 14px; font-size:15.5px; max-width:66ch;
+}
+.pin .pinlabel{
+  font-family:var(--mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--brass); display:block; margin-bottom:5px;
+}
+.pin p{margin:0}
+
+/* ---- table ---- */
+.tablewrap{overflow-x:auto; border:1px solid var(--rule); background:var(--surface); margin:24px 0 0}
+table{border-collapse:collapse; width:100%; min-width:520px; font-size:15px}
+th,td{text-align:left; padding:11px 18px; border-bottom:1px solid var(--rule)}
+th{
+  font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--ink-3); font-weight:400; background:var(--surface-2);
+}
+td:not(:first-child){font-variant-numeric:tabular-nums; font-family:var(--mono); font-size:13.5px}
+tbody tr:last-child td{border-bottom:0}
+tr.you td{background:var(--accent-soft)}
+tr.you td:first-child{font-weight:650}
+
+/* ---- struck list (does not apply) ---- */
+.nolist{display:flex; flex-direction:column; gap:0; margin-top:8px}
+.norow{
+  display:grid; grid-template-columns:216px 1fr; gap:34px;
+  padding:20px 0; border-bottom:1px solid var(--rule); align-items:start;
+}
+.norow:last-child{border-bottom:0}
+.noname{
+  font-family:var(--mono); font-size:12px; letter-spacing:.04em; line-height:1.5;
+  color:var(--flag); border-left:3px solid var(--flag); padding-left:11px;
+}
+.norow p{margin:0; max-width:66ch; color:var(--ink-2); font-size:15.5px}
+
+/* ---- checklist ---- */
+.steps{list-style:none; margin:8px 0 0; padding:0; counter-reset:s}
+.step{
+  display:grid; grid-template-columns:52px 148px 1fr; gap:22px; align-items:start;
+  padding:20px 0; border-bottom:1px solid var(--rule); counter-increment:s;
+}
+.step:last-child{border-bottom:0}
+.step::before{
+  content:counter(s,decimal-leading-zero);
+  font-family:var(--mono); font-size:17px; color:var(--accent); letter-spacing:.02em;
+  font-variant-numeric:tabular-nums; padding-top:2px;
+}
+.when{
+  font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--ink-3); padding-top:5px;
+}
+.what{margin:0}
+.what strong{display:block; font-size:17px; margin-bottom:3px}
+.what span{color:var(--ink-2); font-size:15.5px}
+
+/* ---- footer ---- */
+.foot{margin-top:76px; padding-top:28px; border-top:2px solid var(--ink)}
+.foot h2{font-size:20px; margin-bottom:16px}
+.srcs{columns:2; column-gap:40px; font-size:13.5px; line-height:1.75; color:var(--ink-2)}
+.srcs p{margin:0 0 7px; break-inside:avoid}
+.disclaimer{
+  margin-top:34px; padding:16px 20px; background:var(--surface-2);
+  border:1px solid var(--rule); font-size:14.5px; color:var(--ink-2); max-width:72ch;
+}
+
+@media (max-width:820px){
+  .wrap{padding:0 20px 72px}
+  .entry,.norow{grid-template-columns:1fr; gap:18px}
+  .step{grid-template-columns:38px 1fr; gap:14px}
+  .when{grid-column:2; padding-top:0; order:3}
+  .srcs{columns:1}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important; transition:none!important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="mast">
+  <p class="eyebrow"><span>Micro enterprise</span><span>Services sector</span><span>Bengaluru Urban</span><span>Assessed 27 Aug 2026</span></p>
+  <h1>What the Udyam certificate is actually worth to Qravio</h1>
+  <p class="standfirst">Nearly every "40 benefits of Udyam registration" list online is written for a factory owner. Strip out the electricity tariffs, the machinery subsidies and the outright myths, and what remains for a six-month-old B2B SaaS in Bengaluru is <strong>five things that carry real money</strong> — one of which you should act on before you send your next invoice.</p>
+
+  <div class="glance">
+    <div class="gcell"><span class="gnum">45</span><span class="glabel">Days your buyers now have to pay you</span></div>
+    <div class="gcell"><span class="gnum">₹4,500</span><span class="glabel">Trademark fee per class, halved</span></div>
+    <div class="gcell"><span class="gnum">25%</span><span class="glabel">Of central govt procurement reserved for MSEs</span></div>
+    <div class="gcell"><span class="gnum">₹10 cr</span><span class="glabel">Collateral-free credit cover available</span></div>
+    <div class="gcell"><span class="gnum">₹0</span><span class="glabel">Income tax it saves you directly</span></div>
+  </div>
+</header>
+
+<section>
+  <div class="sechead">
+    <span class="sectag">Tier 1</span>
+    <h2>Worth money now</h2>
+  </div>
+  <p class="secnote">These three are live the moment the certificate exists, cost nothing or nearly nothing to claim, and are the reason the registration was worth doing.</p>
+
+  <div class="entry">
+    <div class="rail">
+      <p class="authority"><em>Governing law</em>MSMED Act 2006, §15–16<br>Income Tax Act, §43B(h)<br>Companies Act, Form MSME-1</p>
+      <span class="worth">Cash flow · immediate</span>
+    </div>
+    <div class="ebody">
+      <h3>Your customers are now legally obliged to pay you within 45 days</h3>
+      <p>This is the single biggest thing the certificate buys a B2B SaaS. Any buyer of Qravio's services must pay within <strong>45 days</strong> of accepting the service where there is a written agreement, and within <strong>15 days</strong> where there isn't. It has three sets of teeth, and the tax one is what actually changes behaviour:</p>
+      <ul>
+        <li><strong>Tax.</strong> Under §43B(h), in force since AY 2024–25, a buyer who misses the window <em>cannot deduct that expense</em> in the year it was incurred. The deduction slips to the year they actually pay. For a company with a March year-end, an unpaid Qravio invoice becomes a real addition to taxable profit.</li>
+        <li><strong>Interest.</strong> The MSMED Act entitles you to compound interest with monthly rests at <strong>three times the RBI bank rate</strong> — punitive by design, and not waivable by contract.</li>
+        <li><strong>Disclosure.</strong> Corporate buyers must file <code>MSME-1</code> with the MCA every half-year (30 Apr / 31 Oct) naming every micro/small supplier left unpaid past 45 days. Non-filing costs them ₹20,000 plus ₹1,000 a day. Their finance teams already run MSME vendor ageing reports to avoid it.</li>
+      </ul>
+      <div class="pin">
+        <span class="pinlabel">The limit that catches people out</span>
+        <p>In <strong>Silpi Industries v. KSRTC</strong> (Supreme Court, 2021) it was settled that Udyam registration is <strong>prospective, never retrospective</strong>. Only services rendered on or after your registration date are covered. Everything Qravio billed before the certificate sits outside this entirely — you cannot go back and claim interest on old receivables.</p>
+      </div>
+      <p><strong>What to do:</strong> put your Udyam Registration Number and the line <em>"Registered Micro Enterprise under the MSMED Act, 2006 — payment due within 45 days"</em> on the invoice template, in the MSA / order form, and in the vendor-onboarding pack. Buyers verify URNs live against the Udyam portal, so make yours easy to find. If someone stalls, <strong>MSME Samadhaan</strong> (samadhaan.msme.gov.in) is free, online, routes to the facilitation council in the <em>buyer's</em> state, is meant to conclude within 90 days, and produces a binding award. Cases are publicly visible, which tends to settle things before a hearing.</p>
+      <p>One caveat with a shelf life: §43B(h) and MSE procurement preference apply to <strong>micro and small only</strong>. A medium enterprise gets neither. This window is open for you now.</p>
+    </div>
+  </div>
+
+  <div class="entry">
+    <div class="rail">
+      <p class="authority"><em>Governing rules</em>Trade Marks Rules 2017,<br>First Schedule<br><br>MSME Innovative Scheme<br>(IPR component)</p>
+      <span class="worth">Saves ~₹19,000</span>
+    </div>
+    <div class="ebody">
+      <h3>Trademark "Qravio" at half fee — then claim the fee back</h3>
+      <p>Government fee for a <code>TM-A</code> e-filing is <strong>₹4,500 per class</strong> for an individual, a DPIIT-recognised startup or a small enterprise, against <strong>₹9,000</strong> for everyone else. The Udyam certificate is your proof of the concessional category, and it applies even if Qravio is a private limited company.</p>
+      <div class="pin">
+        <span class="pinlabel">Hard rule</span>
+        <p>The certificate must be in hand <strong>at the moment Form TM-A is submitted</strong>. There is no later adjustment and no refund. You now qualify — filing before you had it would have cost double.</p>
+      </div>
+      <p>For a QR platform the classes that matter are <strong>42</strong> (software as a service — the core one), <strong>9</strong> (downloadable software, which covers your browser extensions), and arguably <strong>35</strong> if you want to claim the analytics and marketing side. Two classes at the concessional rate is ₹9,000 instead of ₹18,000.</p>
+      <p>Then go further: the <strong>MSME Innovative Scheme</strong>'s IPR component (innovative.msme.gov.in) reimburses <strong>up to ₹10,000</strong> of trademark registration cost, ₹15,000 for a design, ₹1,00,000 for a domestic patent and ₹5,00,000 for a foreign one. Net of the concession and the reimbursement, registering the Qravio wordmark can cost you close to nothing but the attorney's fee.</p>
+    </div>
+  </div>
+
+  <div class="entry">
+    <div class="rail">
+      <p class="authority"><em>Governing policy</em>Public Procurement Policy<br>for MSEs, 2012<br><br>GeM seller terms</p>
+      <span class="worth">New revenue channel</span>
+    </div>
+    <div class="ebody">
+      <h3>Government becomes a reachable customer</h3>
+      <p>Central ministries, departments and CPSEs are required to source at least <strong>25% of annual procurement from micro and small enterprises</strong> (with 4% earmarked for SC/ST-owned and 3% for women-owned units). Registering on GeM as a Udyam-holding MSE gets you:</p>
+      <ul>
+        <li><strong>EMD exemption</strong> — no earnest money deposit blocked on any bid, typically 2–5% of bid value.</li>
+        <li><strong>Tender fee exemption.</strong></li>
+        <li><strong>15% purchase preference</strong> against non-MSE bidders.</li>
+        <li><strong>Prior turnover and prior experience criteria waived</strong> on tenders up to ₹25 lakh.</li>
+      </ul>
+      <p>That last one is the whole point for a company incorporated in February 2026. Turnover and track-record clauses are what normally lock a new vendor out of public procurement, and below ₹25 lakh they simply don't apply to you. In FY 2025–26, MSEs executed 68% of all GeM orders.</p>
+      <p>The procurable shapes of Qravio are real ones: asset-tagging QR for departments, tourism and heritage signage, municipal grievance QR, event and exhibition passes, menu and document landing pages. Dynamic QR with scan analytics is a line item a buyer can write.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sechead">
+    <span class="sectag">Tier 2</span>
+    <h2>Worth money when you need capital</h2>
+  </div>
+  <p class="secnote">Nothing to claim today, but the certificate is the precondition. Worth knowing before you walk into a bank.</p>
+
+  <div class="entry">
+    <div class="rail">
+      <p class="authority"><em>Scheme</em>CGTMSE<br><br>RBI priority sector<br>lending norms</p>
+      <span class="worth">Up to ₹10 cr, no collateral</span>
+    </div>
+    <div class="ebody">
+      <h3>Credit without pledging property</h3>
+      <p>CGTMSE guarantee cover has been doubled to <strong>₹10 crore</strong>. The trust absorbs 75–85% of the lender's loss, which is why a bank will lend against it without asking for property as security. The annual guarantee fee starts around <strong>0.37% p.a.</strong> at small ticket sizes.</p>
+      <p>The services sector is explicitly eligible — IT and software qualify. The realistic ask for Qravio at this stage is a working capital limit or term loan somewhere in the ₹10–50 lakh range with no collateral behind it. Separately, lending to micro and small enterprises counts toward banks' priority-sector targets, so they have a quota reason to say yes that has nothing to do with liking your business.</p>
+      <p>Also announced and rolling out: the <strong>ME-Card</strong>, a customised credit card with a ₹5 lakh limit specifically for micro enterprises registered on Udyam, with a 30–45 day interest-free period. Useful as float against ad spend and cloud bills. Ask your bank whether they're issuing yet.</p>
+    </div>
+  </div>
+
+  <div class="entry">
+    <div class="rail">
+      <p class="authority"><em>Platform</em>TReDS<br>(RXIL / M1xchange /<br>Invoicemart)</p>
+      <span class="worth">Turns receivables into cash</span>
+    </div>
+    <div class="ebody">
+      <h3>Discount a large client's invoice instead of waiting for it</h3>
+      <p>Every company above <strong>₹250 crore</strong> turnover must be onboarded to TReDS, and a June 2026 notification requires all CPSEs to settle MSME invoices through it. If Qravio lands an enterprise or PSU account, you can upload the invoice, have the buyer authenticate it, and let financiers bid to discount it — cash in days at competitive rates rather than a 45-day wait. Only available to you because you're a registered MSME.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sechead">
+    <span class="sectag">Tier 3</span>
+    <h2>Situational, and one honest disappointment</h2>
+  </div>
+
+  <div class="entry">
+    <div class="rail">
+      <p class="authority"><em>Scheme</em>International<br>Cooperation Scheme<br>ic.msme.gov.in</p>
+      <span class="worth">Subsidised expo stand</span>
+    </div>
+    <div class="ebody">
+      <h3>Exhibiting abroad, part-funded</h3>
+      <p>The IC Scheme reimburses stall charges and economy airfare for MSMEs participating in international exhibitions and trade fairs. Applications run in seasonal windows against a published calendar. Only relevant if Qravio decides to work a retail-tech, hospitality or packaging expo overseas — but if that's ever on the plan, this materially changes the cost of the booth.</p>
+    </div>
+  </div>
+
+  <div class="entry">
+    <div class="rail">
+      <p class="authority"><em>State policy</em>Karnataka Industrial<br>Policy 2025–30<br><br>Bengaluru Urban = Zone 3</p>
+      <span class="worth">Near zero for you</span>
+    </div>
+    <div class="ebody">
+      <h3>Karnataka's state layer gives a Bengaluru SaaS almost nothing</h3>
+      <p>Worth saying plainly so you don't spend a week chasing it. Under the 2025–30 policy, Bengaluru Urban and Rural sit in <strong>Zone 3</strong>: no stamp duty exemption, the lowest capital subsidy band, and the incentives are keyed to <strong>eligible fixed capital investment</strong> — plant, machinery, land — which a software company doesn't have. The generous 25–40% investment promotion subsidies are for Zone 1 backward talukas.</p>
+      <p>The Karnataka money actually worth chasing is <strong>ELEVATE</strong>, the state's grant-in-aid programme: up to ₹50 lakh, fully non-dilutive, open at idea / product / revenue stage, with tracks for general, women-led and SC/ST founders. Note that it does <em>not</em> require Udyam or DPIIT — it's a separate track with its own periodic windows, so watch for the next call.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sechead">
+    <span class="sectag warn">Ignore</span>
+    <h2>Benefits you'll read about that don't apply</h2>
+  </div>
+  <p class="secnote">Each of these appears on most "Udyam benefits" listicles. None of them will do anything for you.</p>
+
+  <div class="nolist">
+    <div class="norow">
+      <p class="noname">Electricity tariff concession<br>Security deposit waiver</p>
+      <p>State schemes for <strong>manufacturing units</strong>. There is no service-sector equivalent, in Karnataka or elsewhere.</p>
+    </div>
+    <div class="norow">
+      <p class="noname">CLCSS<br>15% capital subsidy</p>
+      <p>A grant against investment in plant and machinery for technology upgradation. No machinery, no subsidy.</p>
+    </div>
+    <div class="norow">
+      <p class="noname">ZED certification subsidy</p>
+      <p>Zero Defect Zero Effect is a manufacturing quality and environmental certification. Not applicable to software.</p>
+    </div>
+    <div class="norow">
+      <p class="noname">"1% exemption on<br>overdraft interest"</p>
+      <p>Repeated on nearly every Udyam blog and reproduced by every AI that has read them. <strong>There is no scheme behind it.</strong> At best an individual bank prices an MSME OD slightly finer at its own discretion. Do not put it in a cash-flow model.</p>
+    </div>
+    <div class="norow">
+      <p class="noname">Income tax exemption</p>
+      <p><strong>Udyam grants none.</strong> The tax holiday people mean is §80-IAC, which runs entirely through DPIIT recognition plus Inter-Ministerial Board approval — a different certificate on a different track. See below.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sechead">
+    <span class="sectag">Adjacent</span>
+    <h2>The other certificate you should hold</h2>
+  </div>
+  <p class="secnote">DPIIT Startup India recognition is complementary, not an alternative. It is free, takes one to three weeks, and the benefits barely overlap with Udyam's — but the case for it is not the one usually made.</p>
+
+  <div class="entry">
+    <div class="rail">
+      <p class="authority"><em>Gating requirement</em>Pvt Ltd, LLP, registered<br>partnership or cooperative<br><br>Sole proprietorship and<br>HUF are NOT eligible</p>
+      <span class="worth">Check this first</span>
+    </div>
+    <div class="ebody">
+      <h3>One fact decides whether any of this is available</h3>
+      <p>DPIIT recognition is closed to sole proprietorships and Hindu Undivided Families. If Qravio trades as a proprietorship today, the question stops being "should I apply" and becomes "should I incorporate" — a materially bigger decision with its own compliance cost. Confirm the entity type before reading further.</p>
+      <p>The current framework is <strong>G.S.R. 108(E)</strong>, notified 4 February 2026. It raised the turnover ceiling from ₹100 crore to <strong>₹200 crore</strong>, kept the 10-year recognition window, and added a separate <strong>deep tech</strong> category with a 20-year window and a ₹300 crore ceiling. Older guides quoting ₹100 crore are out of date.</p>
+      <p>Applications are filed on <strong>NSWS</strong> (nsws.gov.in), not on the Startup India portal any more. There is no government fee. Turnaround is typically one to three weeks. The dominant cause of rejection is a vague innovation description — so lead with something concrete and specific to Qravio rather than a category label.</p>
+    </div>
+  </div>
+
+  <div class="entry">
+    <div class="rail">
+      <p class="authority"><em>Scheme</em>Startup India Seed Fund<br>(SISFS)<br><br>Credit Guarantee Scheme<br>for Startups (CGSS)</p>
+      <span class="worth">The actual reason to apply</span>
+    </div>
+    <div class="ebody">
+      <h3>Two funding rails you cannot reach any other way</h3>
+      <ul>
+        <li><strong>SISFS</strong> — up to <strong>₹20 lakh as a non-dilutive grant</strong> for proof of concept and prototyping, plus up to <strong>₹50 lakh</strong> as debt or a convertible instrument for scaling. Requires DPIIT recognition <em>and</em> incorporation no more than <strong>two years</strong> before the date of application. Qravio was incorporated in February 2026, so that door closes around <strong>February 2028</strong>.</li>
+        <li><strong>CGSS</strong> — the startup credit guarantee, open only to DPIIT-recognised entities. Cover per borrower was recently raised from ₹10 crore to <strong>₹20 crore</strong>, with 85% of the amount in default covered up to ₹10 crore. This is a <em>separate rail</em> from the CGTMSE cover Udyam gives you; having both available matters for a company with nothing to pledge.</li>
+      </ul>
+      <div class="pin">
+        <span class="pinlabel">Why the timing argues for applying now</span>
+        <p>The last SISFS cycle closed <strong>31 May 2026</strong> and the next has no announced date. Applications route through an approved incubator, which takes preparation, and DPIIT recognition is a hard prerequisite that itself takes weeks. You cannot assemble this after a window opens. Recognition is free and has no ongoing compliance burden, so holding it unused costs nothing.</p>
+      </div>
+      <p>Karnataka's state startup incentives also generally gate on DPIIT recognition — but note they need a <em>separate</em> Karnataka Startup Cell registration on top, and ELEVATE specifically requires neither.</p>
+    </div>
+  </div>
+
+  <div class="entry">
+    <div class="rail">
+      <p class="authority"><em>Reality check</em>Income Tax Act, §80-IAC<br>Inter-Ministerial Board<br><br>SIPP — expired<br>31 March 2026</p>
+      <span class="worth">Do not plan around these</span>
+    </div>
+    <div class="ebody">
+      <h3>The two benefits people apply for, and why neither is the reason</h3>
+      <p><strong>§80-IAC is close to a lottery ticket.</strong> It exempts 100% of profits for any 3 consecutive years out of the first 10, but DPIIT recognition is only the prerequisite — the exemption itself needs separate Inter-Ministerial Board approval. As of April 2026, roughly <strong>3,700 startups held an IMB certificate out of more than 1.97 lakh DPIIT-recognised entities</strong>, under 2%. It also only exempts profits, which Qravio does not yet have. The incorporation deadline runs to <strong>31 March 2030</strong>, so get recognised now and approach the IMB later, when there is a real innovation case and something to shelter.</p>
+      <p><strong>The IP benefits are mostly already yours or already gone.</strong> The 50% trademark rebate is the same ₹4,500 concessional rate your Udyam certificate gives you — no marginal gain. The 80% patent fee rebate is DPIIT-only but irrelevant unless you file a patent. And <strong>SIPP, which had the government pay your IP attorney's professional fees, expired on 31 March 2026</strong> with no announced replacement, so new filings are privately funded end to end.</p>
+      <p>What does carry over with no overlap: <strong>self-certification</strong> under 9 labour and 3 environment laws for five years, and fast-track winding up under the IBC. Minor at 1–10 employees, but free.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sechead">
+    <span class="sectag">Maintenance</span>
+    <h2>How to not quietly lose it</h2>
+  </div>
+  <p class="secnote">The certificate never expires and needs no renewal — which is exactly why the annual obligation gets forgotten.</p>
+
+  <div class="entry">
+    <div class="rail">
+      <p class="authority"><em>Obligation</em>Annual update against<br>ITR and GST filings<br><br>PAN + GSTIN linkage</p>
+      <span class="worth">Silent failure risk</span>
+    </div>
+    <div class="ebody">
+      <h3>Update it every year, right after you file your ITR</h3>
+      <p>Udyam pulls investment and turnover automatically from your PAN/ITR and GST data, and registered enterprises are required to update and confirm those details annually. Let it lapse and the registration is <strong>suspended</strong> — at which point §43B(h) protection stops working, your GeM MSE exemptions stop applying, and scheme eligibility falls away. Nobody sends you a warning; you find out when a buyer's AP team checks your URN and it comes back inactive.</p>
+      <p>GSTIN is required for a permanent certificate, so keep the GST registration and the Udyam record consistent — the same legal name, the same PAN.</p>
+
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr><th>Class</th><th>Investment ceiling</th><th>Turnover ceiling</th><th>§43B(h) &amp; MSE preference</th></tr>
+          </thead>
+          <tbody>
+            <tr class="you"><td>Micro — Qravio today</td><td>₹2.5 cr</td><td>₹10 cr</td><td>Yes</td></tr>
+            <tr><td>Small</td><td>₹25 cr</td><td>₹100 cr</td><td>Yes</td></tr>
+            <tr><td>Medium</td><td>₹125 cr</td><td>₹500 cr</td><td>No</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top:16px; font-size:15px; color:var(--ink-3)">Limits revised upward with effect from 1 April 2025 — investment ceilings 2.5×, turnover ceilings 2×. Growing micro → small changes nothing about your benefits. Small → medium is where the payment protection and procurement preference are lost.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sechead">
+    <span class="sectag">Order of play</span>
+    <h2>Do these, in this order</h2>
+  </div>
+
+  <ol class="steps">
+    <li class="step">
+      <span class="when">This week</span>
+      <p class="what"><strong>Put the URN on every invoice and contract</strong><span>Add the registration number and the 45-day MSMED clause to the invoice template, the MSA and the vendor-onboarding pack. Costs nothing, takes an hour, and covers every rupee you bill from that moment on.</span></p>
+    </li>
+    <li class="step">
+      <span class="when">This week</span>
+      <p class="what"><strong>File TM-A for the Qravio wordmark</strong><span>Classes 42 and 9 at ₹4,500 each while the certificate is live. Confirm the concessional category with your attorney before filing — there is no refund if it's claimed wrongly.</span></p>
+    </li>
+    <li class="step">
+      <span class="when">This month</span>
+      <p class="what"><strong>Register as an MSE seller on GeM</strong><span>Upload the Udyam certificate so the EMD and tender-fee exemptions attach automatically, then look at what's actually being tendered under ₹25 lakh in your categories.</span></p>
+    </li>
+    <li class="step">
+      <span class="when">This month</span>
+      <p class="what"><strong>Apply for DPIIT Startup India recognition</strong><span>Separate track, complementary benefits, and the ten-year §80-IAC clock started in February.</span></p>
+    </li>
+    <li class="step">
+      <span class="when">On registration</span>
+      <p class="what"><strong>Claim the IPR reimbursement</strong><span>Once the trademark registers, file on innovative.msme.gov.in for up to ₹10,000 back.</span></p>
+    </li>
+    <li class="step">
+      <span class="when">When you want capital</span>
+      <p class="what"><strong>Ask your bank for a CGTMSE-backed limit</strong><span>And whether they're issuing the ME-Card yet. Lead with the Udyam certificate — it changes which desk your file lands on.</span></p>
+    </li>
+    <li class="step">
+      <span class="when">Every year</span>
+      <p class="what"><strong>Update Udyam after filing the ITR</strong><span>Put it in the calendar against the ITR deadline. A suspended registration fails silently and takes the payment protection with it.</span></p>
+    </li>
+  </ol>
+</section>
+
+<footer class="foot">
+  <div class="disclaimer">
+    Researched 27 August 2026 against current notifications. Two things to confirm with your CA or company secretary before acting: the concessional trademark fee category, which depends on Qravio's exact entity type, and anything touching income tax. Scheme parameters and application windows change without much notice — verify on the official portal before you file.
+  </div>
+
+  <h2 style="margin-top:40px">Sources</h2>
+  <div class="srcs">
+    <p>Udyam Registration Portal — udyamregistration.gov.in</p>
+    <p>Ministry of MSME notification S.O. 1364(E), 21 Mar 2025 — revised classification criteria</p>
+    <p>MSMED Act 2006, §15–16; MSME Samadhaan — samadhaan.msme.gov.in</p>
+    <p>Income Tax Act §43B(h), Finance Act 2023, effective AY 2024–25</p>
+    <p>Silpi Industries v. Kerala State Road Transport Corporation, (2021) SC — prospective effect of registration</p>
+    <p>Trade Marks Rules 2017, First Schedule — concessional fee for small enterprises</p>
+    <p>MSME Innovative Scheme, IPR component — innovative.msme.gov.in</p>
+    <p>Public Procurement Policy for MSEs, 2012; GeM seller terms</p>
+    <p>CGTMSE scheme guidelines — enhanced ₹10 cr cover</p>
+    <p>Union Budget 2025–26 — ME-Card for Udyam-registered micro enterprises</p>
+    <p>MSME notification on TReDS onboarding, 7 Nov 2024; CPSE settlement notification, 30 Jun 2026</p>
+    <p>MCA Form MSME-1, Companies Act §405 — half-yearly buyer disclosure</p>
+    <p>International Cooperation Scheme — ic.msme.gov.in</p>
+    <p>Karnataka Industrial Policy 2025–30 — zone classification and MSME incentives</p>
+    <p>Startup Karnataka ELEVATE 2026 programme guidelines</p>
+    <p>DPIIT notification G.S.R. 108(E), 4 Feb 2026 — revised startup definition and deep tech category</p>
+    <p>DPIIT recognition filings — nsws.gov.in; §80-IAC and IMB — startupindia.gov.in</p>
+    <p>Startup India Seed Fund Scheme guidelines; Credit Guarantee Scheme for Startups (CGSS) — ncgtc.in</p>
+    <p>SIPP scheme — lapsed 31 Mar 2026, no notified replacement</p>
+  </div>
+</footer>
+
+</div>
+</body>
+</html>
