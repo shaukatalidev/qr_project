@@ -2,6 +2,37 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Git workflow — NEVER push to `main`
+
+**`main` is never pushed to directly. Not for a one-line fix, not for a revert, not for a
+merge, not "just this once".**
+
+Before any commit, check the current branch:
+
+```bash
+git -C <repo> branch --show-current
+```
+
+- **On `main`** → create a branch off it first, then commit and push there:
+  ```bash
+  git -C <repo> checkout -b <type>/<short-description>
+  ```
+- **On any other branch** → commit and push to that branch.
+
+Then open a PR and let a human merge it. Landing the change is the repo owner's decision, not
+the agent's — and a PR is the only place the diff gets read before it becomes the deployed
+truth.
+
+**This applies per repo.** `qr_backend`, `qr_frontend` and `qr_cf_code` are three separate git
+repos (the root is a fourth, for specs and scripts), so the check has to be repeated in each
+one — being on a branch in one says nothing about the others.
+
+**Merging branches counts as pushing to main.** If asked to merge, do the merge locally, run
+that repo's full gate, and then say it is ready — do not push the merge commit to `main`
+without being asked for that specifically.
+
+Branch naming already in use here: `feat/…`, `fix/…`, `docs/…`, `chore/…`.
+
 ## Project Overview
 
 QR Code SaaS monorepo with three independent services:
